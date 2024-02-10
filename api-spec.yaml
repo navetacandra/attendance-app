@@ -1,108 +1,67 @@
 openapi: 3.0.3
 info:
   title: Presence API
+  description: |-
+    This is a Presence API based on the OpenAPI 3.0 specification. 
+  version: 1.0.0
   contact:
     name: navetacandra
     email: naveta.cand@gmail.com
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
+    url: https://navetacandra.github.io/
 servers:
   - url: http://localhost:3000/api/v1
-    description: Development server
+    description: Local development server
 tags:
   - name: mode
-    description: Presence Mode
+    description: Operations about mode
   - name: schedule
-    description: Presence Schedule
+    description: Operations about schedule
   - name: student
+    description: Operations about student
   - name: whatsapp
-    description: WhatsApp state and utils
-
+    description: Operations about whatsapp
 paths:
   /mode:
     get:
-      summary: Stream / Get mode
+      summary: Get mode
       tags:
         - mode
       responses:
         200:
-          description: Successful subscription
+          description: Successful get mode
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  code:
-                    type: number
-                  data:
-                    type: object
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
                     properties:
-                      mode:
-                        type: boolean
+                      data:
+                        $ref: "#/components/schemas/Mode"
               examples:
-                AddMode:
+                add:
                   value: {
                     "success": true,
                     "code": 200,
-                    "data": {
-                      "mode": "add"
-                    }
+                    "data": {"mode": "add"}
                   }
-                PresenceMode:
+                presence:
                   value: {
                     "success": true,
                     "code": 200,
-                    "data": {
-                      "mode": "presence"
-                    }
+                    "data": {"mode": "presence"}
                   }
             text/event-stream:
               schema:
                 type: string
                 properties:
                   data:
-                    type: object
-                    properties:
-                      mode:
-                        type: string
+                    $ref: "#/components/schemas/Mode"
               examples:
-                AddMode:
-                  value: |
-                    data: {"mode": "add"}
-                PresenceMode:
-                  value: |
-                    data: {"mode": "presence"}
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
-        500:
-          description: Error server when subscription
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                FirebaseErrorStream:
-                  $ref: "#/components/examples/FirebaseErrorStream"
+                add:
+                  value: "data: {\"mode\": \"add\"}"
+                presence:
+                  value: "data: {\"mode\": \"presence\"}"
     put:
       summary: Update mode
       tags:
@@ -110,111 +69,187 @@ paths:
       requestBody:
         required: true
         content:
-          apllication/json:
+          application/json:
             schema:
-              type: object
-              properties:
-                mode:
-                  type: string
-                  enum:
-                    - add
-                    - peresence
+              $ref: "#/components/schemas/Mode"
             examples:
-              AddMode:
-                value: {"mode": "add"}
-              PresenceMode:
-                value: {"mode": "presence"}
+                add:
+                  value: {"mode": "add"}
+                presence:
+                  value: {"mode": "presence"}
       responses:
         200:
-          description: Successful update
+          description: Successful update mode
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  mode:
-                    type: string
-                    enum:
-                      - add
-                      - presence
-        401:
-          description: Unauthorized
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Mode"
+              examples:
+                add:
+                  value: {
+                    "success": true,
+                    "code": 200,
+                    "data": {"mode": "add"}
+                  }
+                presence:
+                  value: {
+                    "success": true,
+                    "code": 200,
+                    "data": {"mode": "presence"}
+                  }
+        400:
+          description: Invalid mode
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
-  /schedule:
+              example: {
+                "success": false,
+                "code": 400,
+                "error": {
+                  "message": "Invalid mode",
+                  "code": "INVALID_DATA"
+                }
+              }
+  /schedule-detail:
     get:
-      summary: Stream / Get schedule
+      summary: Get schedule detail
       tags:
         - schedule
       responses:
         200:
-          description: Successful stream / get schedule
+          description: Successful get schedule detail
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Schedule"
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ScheduleDetail"
               example: {
-                "masukAwal": "05:00",
-                "masukAkhir": "07:30",
-                "pulangAwal": "15:30",
-                "pulangAkhir": "20:00"
+                "success": true,
+                "code": 200,
+                "data": {
+                  "masukStart": "05:00",
+                  "masukEnd": "06:30",
+                  "pulangStart": "15:00",
+                  "pulangEnd": "18:00"
+                }
               }
             text/event-stream:
               schema:
                 type: string
                 properties:
                   data:
-                    $ref: "#/components/schemas/Schedule"
-              example: |
-                data: {
-                  "masukAwal": "05:00",
-                  "masukAkhir": "07:30",
-                  "pulangAwal": "15:30",
-                  "pulangAkhir": "20:00"
+                    $ref: "#/components/schemas/ScheduleDetail"
+              example: "data: {\"masukStart\": \"05:00\", \"masukEnd\": \"06:30\", \"pulangStart\": \"15:00\", \"pulangEnd\": \"18:00\"}"
+    put:
+      summary: Update schedule detail
+      tags:
+        - schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScheduleDetail"
+            example: {
+                "masukStart": "06:00",
+                "masukEnd": "08:00",
+                "pulangStart": "16:00",
+                "pulangEnd": "20:00"
+              }
+      responses:
+        200:
+          description: Successful update schedule detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/ScheduleDetail"
+              example: {
+                "success": true,
+                "code": 200,
+                "data": {
+                  "masukStart": "06:00",
+                  "masukEnd": "08:00",
+                  "pulangStart": "16:00",
+                  "pulangEnd": "20:00"
                 }
-        401:
-          description: Unauthorized
+              }
+        400:
+          description: Invalid data
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
+              example: {
+                "success": false,
+                "code": 400,
+                "error": {
+                  "message": "\"masukStart\" is invalid",
+                  "code": "INVALID_DATA"
+                }
+              }
+  /schedule:
+    get:
+      summary: Get schedule
+      tags:
+        - schedule
+      responses:
+        200:
+          description: Successful get schedule
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
-        500:
-          description: Error server when subscription
-          content:
-            application/json:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ScheduleWithId"
+              example: {
+                "success": true,
+                "code": 200,
+                "data": [
+                  {
+                    "_id": "1",
+                    "month": "januari",
+                    "date": "1",
+                    "isActive": false
+                  },
+                  {
+                    "_id": "2",
+                    "month": "januari",
+                    "date": "2",
+                    "isActive": true
+                  }
+                ]
+              }
+            text/event-stream:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                FirebaseErrorStream:
-                  $ref: "#/components/examples/FirebaseErrorStream"
+                type: string
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ScheduleWithId"
+              example: "data: [{\"_id\":\"1\",\"month\":\"januari\",\"date\":\"1\",\"isActive\":false}, {\"_id\":\"2\",\"month\":\"januari\",\"date\":\"2\",\"isActive\":true}]"
     put:
       summary: Update schedule
       tags:
@@ -226,10 +261,9 @@ paths:
             schema:
               $ref: "#/components/schemas/Schedule"
             example: {
-                "masukAwal": "05:00",
-                "masukAkhir": "07:30",
-                "pulangAwal": "15:30",
-                "pulangAkhir": "20:00"
+                "month": "januari",
+                "date": "1",
+                "isActive": true
               }
       responses:
         200:
@@ -237,355 +271,112 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Schedule"
-              example: {
-                "success": true,
-                "code": 200,
-                "data": {
-                  "masukAwal": "05:00",
-                  "masukAkhir": "07:30",
-                  "pulangAwal": "15:30",
-                  "pulangAkhir": "20:00"
-                }
-              }
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
-  /whatsapp:
-    get:
-      summary: Stream / Get WhatsApp state
-      tags:
-        - whatsapp
-      responses:
-        200:
-          description: Successful stream / get WhatsApp state
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  code:
-                    type: number
-                  data:
-                    oneOf:
-                      - $ref: "#/components/schemas/WhatsAppGuest"
-                      - $ref: "#/components/schemas/WhatsAppLoggedIn"
-              examples:
-                Guest:
-                  value: {
-                    "success": true,
-                    "code": 200,
-                    "data": {
-                      "isReady": true,
-                      "qrcode": "base64:image/png,..."
-                    }
-                  }
-                LoggedIn:
-                  value: {
-                    "success": true,
-                    "code": 200,
-                    "data": {
-                      "isReady": true,
-                      "user": {
-                        "name": "bot",
-                        "phone": "+62 851 2345-6789",
-                        "profilePict": "https://unsplash.com/image.jpeg"
-                      }
-                    }
-                  }
-            text/event-stream:
-              schema:
-                type: string
-                properties:
-                  data:
-                    oneOf:
-                      - $ref: "#/components/schemas/WhatsAppGuest"
-                      - $ref: "#/components/schemas/WhatsAppLoggedIn"
-              examples:
-                Guest:
-                  value: |
-                    data: {
-                      "isReady": true,
-                      "qrcode": "base64:image/png,..."
-                    }
-                LoggedIn:
-                  value: |
-                    data: {
-                      "isReady": true,
-                      "user": {
-                        "name": "bot",
-                        "phone": "+62 851 2345-6789",
-                        "profilePict": "https://unsplash.com/image.jpeg"
-                      }
-                    }
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
-        500:
-          description: Error server when stream / get
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                WhatsAppErrorStream:
-                  value: {
-                      "success": false,
-                      "code": 500,
-                      "error": {
-                        "message": "WhatsApp error stream",
-                        "code": "WHATSAPP_ERROR_STREAM"
-                      }
-                    }
-  /whatsapp/isregistered:
-    post:
-      summary: Get number is registered in WhatsApp
-      tags:
-        - whatsapp
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                number:
-                  type: string
-            example: {
-              "number": "08123456789"
-            }
-      responses:
-        200:
-          description: Success get number is registered
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WhatsAppIsRegistered"
-              example: {
-                  "success": true,
-                  "code": 200,
-                  "data": {
-                    "number": "08123456789",
-                    "prettifiedNumber": "628123456789",
-                    "isRegistered": true
-                  }
-                }
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
-        404:
-          description: Number is not registered in WhatsApp
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WhatsAppIsRegistered"
-              example: {
-                  "success": false,
-                  "code": 404,
-                  "data": {
-                    "number": "08123456789",
-                    "prettifiedNumber": "628123456789",
-                    "isRegistered": false
-                  }
-                }
-  /user:
-    get:
-      summary: Stream / Get user details
-      tags:
-        - user
-      responses:
-        200:
-          description: Success stream / get user details
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    default: true
-                  code:
-                    type: number
-                    default: 200
-                  data:
-                    type: object
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
                     properties:
-                      uid:
-                        type: string
-                      name:
-                        type: string
-                      email:
-                        type: string
-                      photoURL:
-                        type: string
-                      role:
-                        type: number
-              example: {
-                "success": true,
-                "code": 200,
-                "data": {
-                  "uid": "abc123456def",
-                  "name": "admin",
-                  "email": "admin@gmail.com",
-                  "photoURL": "https://google.com/image.png",
-                  "role": 0
-                }
-              }
-            text/event-stream:
-              schema:
-                type: string
-                properties:
-                  uid:
-                    type: string
-                  name:
-                    type: string
-                  email:
-                    type: string
-                  photoURL:
-                    type: string
-                  role:
-                    type: number
-              example: |
-                data: {
-                  "uid": "abc123456def",
-                  "name": "admin",
-                  "email": "admin@gmail.com",
-                  "photoURL": "https://google.com/image.png",
-                  "role": 0
-                }
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
-        404:
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                UserNotFound:
-                  value: {
-                    "success": false,
-                    "code": 404,
-                    "error": {
-                      "message": "User not found",
-                      "code": "USER_NOT_FOUND"
-                    }
-                  }
-        500:
-          description: Error server when subscription
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                FirebaseErrorStream:
-                  $ref: "#/components/examples/FirebaseErrorStream"
-  /students:
-    get:
-      summary: Stream / Get students
-      tags:
-        - student
-      responses:
-        200:
-          description: Successful subscription / get
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  code:
-                    type: number
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Student"
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ScheduleWithId"
               example: {
                 "success": true,
                 "code": 200,
                 "data": [
                   {
-                    "nis": "222310344",
-                    "nama": "Naveta Candra Chairullah",
-                    "alamat": "Pasar Kemis, Tangerang, Banten",
-                    "telSiswa": "08123456789",
-                    "telWaliMurid": "0812345678910",
-                    "telWaliKelas": "081234567891011",
-                    "kelas": "11 RPL1",
-                    "card": "-A8-SS-DF-GH"
+                    "_id": "1",
+                    "month": "januari",
+                    "date": "1",
+                    "isActive": true
                   },
                   {
-                    "nis": "222310344",
-                    "nama": "Naveta Candra Chairullah",
-                    "alamat": "Pasar Kemis, Tangerang, Banten",
-                    "telSiswa": "08123456789",
-                    "telWaliMurid": "0812345678910",
-                    "telWaliKelas": "081234567891011",
+                    "_id": "2",
+                    "month": "januari",
+                    "date": "2",
+                    "isActive": true
+                  }
+                ]
+              }
+        400:
+          description: Invalid data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example: {
+                "success": false,
+                "code": 400,
+                "error": {
+                  "message": "\"month\" is required",
+                  "code": "INVALID_DATA"
+                }
+              }
+        404:
+          description: Date not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example: {
+                "success": false,
+                "code": 404,
+                "error": {
+                  "message": "\"date\" is not found",
+                  "code": "DATE_NOT_FOUND"
+                }
+              }
+  /students:
+    get:
+      summary: Get students
+      tags:
+        - student
+      responses:
+        200:
+          description: Successful get students
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          allOf:
+                            - type: object
+                              properties:
+                                _id:
+                                  type: string
+                              required:
+                                - _id
+                            - $ref: "#/components/schemas/Student"
+              example: {
+                "success": true,
+                "code": 200,
+                "data": [
+                  {
+                    "_id": "1",
+                    "nis": "123456789",
+                    "nama": "Abraham Billy Marawali",
+                    "email": "abraham@gmail.com",
                     "kelas": "11 RPL1",
+                    "alamat": "Tangerang, Banten",
+                    "telSiswa": "08123456789",
+                    "telWaliMurid": "08123456789",
+                    "telWaliKelas": "08123456789",
+                  },
+                  {
+                    "_id": "2",
+                    "nis": "012345678",
+                    "nama": "Ailda Prima Yukayla",
+                    "email": "ailda@gmail.com",
+                    "kelas": "11 RPL1",
+                    "alamat": "Tangerang, Banten",
+                    "telSiswa": "08123456789",
+                    "telWaliMurid": "08123456789",
+                    "telWaliKelas": "08123456789",
+                    "card": "-A0-4G-33-FE"
                   }
                 ]
               }
@@ -597,46 +388,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Student"
-              example: |
-                data: [
-                  {
-                    "nis": "222310344",
-                    "nama": "Naveta Candra Chairullah",
-                    "alamat": "Pasar Kemis, Tangerang, Banten",
-                    "telSiswa": "08123456789",
-                    "telWaliMurid": "0812345678910",
-                    "telWaliKelas": "081234567891011",
-                    "kelas": "11 RPL1",
-                    "card": "-A8-SS-DF-GH"
-                  }
-                ]
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
-        500:
-          description: Error server when subscription
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                FirebaseErrorStream:
-                  $ref: "#/components/examples/FirebaseErrorStream"
+                example: "data: [{\"_id\":\"1\",\"nis\": \"123456789\",\"nama\":\"AbrahamBillyMarawali\",\"email\":\"abraham@gmail.com\",\"kelas\":\"11RPL1\",\"alamat\":\"Tangerang,Banten\",\"telSiswa\":\"08123456789\",\"telWaliMurid\":\"08123456789\",\"telWaliKelas\":\"08123456789\",}, {\"_id\":\"2\",\"nis\": \"012345678\",\"nama\":\"AildaPrimaYukayla\",\"email\":\"ailda@gmail.com\",\"kelas\":\"11RPL1\",\"alamat\":\"Tangerang,Banten\",\"telSiswa\":\"08123456789\",\"telWaliMurid\":\"08123456789\",\"telWaliKelas\":\"08123456789\",\"card\":\"-A0-4G-33-FE\"}]"
     post:
       summary: Create new student
       tags:
@@ -648,53 +400,60 @@ paths:
             schema:
               $ref: "#/components/schemas/Student"
             examples:
-              StudentWithCard:
-                $ref: "#/components/examples/StudentWithCard"
-              StudentWithoutCard:
-                $ref: "#/components/examples/StudentWithoutCard"
+              withoutCard:
+                value: {
+                    "nis": "001234567",
+                    "nama": "Adinda Salsabila",
+                    "email": "adinda@gmail.com",
+                    "kelas": "11 RPL1",
+                    "alamat": "Tangerang, Banten",
+                    "telSiswa": "08123456789",
+                    "telWaliMurid": "08123456789",
+                    "telWaliKelas": "08123456789",
+                  }
+              withCard:
+                value: {
+                    "nis": "001234567",
+                    "nama": "Adinda Salsabila",
+                    "email": "adinda@gmail.com",
+                    "kelas": "11 RPL1",
+                    "alamat": "Tangerang, Banten",
+                    "telSiswa": "08123456789",
+                    "telWaliMurid": "08123456789",
+                    "telWaliKelas": "08123456789",
+                    "card": "-55-A3-BF-G1"
+                  }
       responses:
         200:
-          description: Create new student
+          description: Successful create new student
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: object
-                    properties:
-                      nis:
-                        type: string
-                      nama:
-                        type: string
+                  id:
+                    type: string
+                    example: "3"
+                  nama:
+                    type: string
+                    example: "Adinda Salsabila"
+                  nis:
+                    type: string
+                    example: "001234567"
+        400:
+          description: Invalid data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               example: {
-                "success": true,
-                "code": 200,
-                "data": {
-                  "nis": "222310344",
-                  "nama": "Naveta Candra Chairullah"
+                "success": false,
+                "code": 400,
+                "error": {
+                  "message": "nis already registered",
+                  "code": "NIS_ALREADY_REGISTERED"
                 }
               }
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
   /student/{studentId}:
     parameters:
       - in: path
@@ -703,103 +462,52 @@ paths:
         schema:
           type: string
     get:
-      summary: Stream / Get student by id
+      summary: Get student by id
       tags:
         - student
       responses:
         200:
-          description: Successful subscription / Get
+          description: Successful get student by id
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  code:
-                    type: number
-                  data:
-                    $ref: "#/components/schemas/Student"
-              examples:
-                StudentWithCard:
-                  $ref: "#/components/examples/StudentWithCard"
-                StudentWithoutCard:
-                  $ref: "#/components/examples/StudentWithoutCard"
-            text/event-stream:
-              schema:
-                type: string
-                properties:
-                  data:
-                    $ref: "#/components/schemas/Student"
-              examples:
-                StudentWithCard:
-                  value: |
-                    data: {
-                      "nis": "222310344",
-                      "nama": "Naveta Candra Chairullah",
-                      "alamat": "Pasar Kemis, Tangerang, Banten",
-                      "telSiswa": "08123456789",
-                      "telWaliMurid": "0812345678910",
-                      "telWaliKelas": "081234567891011",
-                      "kelas": "11 RPL1",
-                      "card": "-A8-SS-DF-GH"
-                    }
-                StudentWithoutCard:
-                  value: |
-                    data: {
-                      "nis": "222310344",
-                      "nama": "Naveta Candra Chairullah",
-                      "alamat": "Pasar Kemis, Tangerang, Banten",
-                      "telSiswa": "08123456789",
-                      "telWaliMurid": "0812345678910",
-                      "telWaliKelas": "081234567891011",
-                      "kelas": "11 RPL1"
-                    }
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Student"
+              example: {
+                "success": true,
+                "code": 200,
+                "data": {
+                  "_id": "1",
+                  "nis": "123456789",
+                  "nama": "Abraham Billy Marawali",
+                  "email": "abraham@gmail.com",
+                  "kelas": "11 RPL1",
+                  "alamat": "Tangerang, Banten",
+                  "telSiswa": "08123456789",
+                  "telWaliMurid": "08123456789",
+                  "telWaliKelas": "08123456789",
+                }
+              }
         404:
-          description: Student not found
+          description: Student not registered
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                StudentNotFound:
-                  value: {
-                    "success": false,
-                    "code": 404,
-                    "error": {
-                      "message": "Student not found",
-                      "code": "STUDENT_NOT_FOUND"
-                    }
-                  }
-        500:
-          description: Error server when subscription
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                FirebaseErrorStream:
-                  $ref: "#/components/examples/FirebaseErrorStream"
+              example: {
+                "success": false,
+                "code": 404,
+                "error": {
+                  "message": "Student is not registered",
+                  "code": "STUDENT_NOT_REGISTERED"
+                }
+              }
     put:
-      summary: Update student
+      summary: Update student by id
       tags:
         - student
       requestBody:
@@ -809,199 +517,455 @@ paths:
             schema:
               $ref: "#/components/schemas/Student"
             examples:
-              StudentWithCard:
-                $ref: "#/components/examples/StudentWithCard"
-              StudentWithoutCard:
-                $ref: "#/components/examples/StudentWithoutCard"
+              withoutCard:
+                value: {
+                    "nis": "001234567",
+                    "nama": "Adinda Salsabila",
+                    "email": "emailnya.adinda@gmail.com",
+                    "kelas": "11 RPL1",
+                    "alamat": "Tangerang, Banten",
+                    "telSiswa": "08123456789",
+                    "telWaliMurid": "08123456789",
+                    "telWaliKelas": "08123456789",
+                  }
+              withCard:
+                value: {
+                    "nis": "001234567",
+                    "nama": "Adinda Salsabila",
+                    "email": "emailnya.adinda@gmail.com",
+                    "kelas": "11 RPL1",
+                    "alamat": "Tangerang, Banten",
+                    "telSiswa": "08123456789",
+                    "telWaliMurid": "08123456789",
+                    "telWaliKelas": "08123456789",
+                    "card": "-55-A3-BF-G1"
+                  }
       responses:
         200:
-          description: Successful update student
+          description: Successful create new student
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: object
-                    properties:
-                      nis:
-                        type: string
-                      nama:
-                        type: string
+                  id:
+                    type: string
+                    example: "3"
+                  nama:
+                    type: string
+                    example: "Adinda Salsabila"
+                  nis:
+                    type: string
+                    example: "001234567"
+        400:
+          description: Invalid data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               example: {
-                "success": true,
-                "code": 200,
-                "data": {
-                  "nis": "222310344",
-                  "nama": "Naveta Candra Chairullah"
+                "success": false,
+                "code": 400,
+                "error": {
+                  "message": "\"email\" is required",
+                  "code": "INVALID_DATA"
                 }
               }
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
         404:
-          description: Student not found
+          description: Student not registered
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                StudentNotFound:
-                  value: {
-                    "success": false,
-                    "code": 404,
-                    "error": {
-                      "message": "Student not found",
-                      "code": "STUDENT_NOT_FOUND"
-                    }
-                  }
+              example: {
+                "success": false,
+                "code": 404,
+                "error": {
+                  "message": "Student is not registered",
+                  "code": "STUDENT_NOT_REGISTERED"
+                }
+              }
     delete:
       summary: Delete student by id
       tags:
         - student
       responses:
         200:
-          description: Success delete student
+          description: Successful delete student
           content:
-            application/json:
+            appliaction/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    default: true
-                  code:
-                    type: number
-                    default: 200
-                  data:
-                    type: object
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
                     properties:
-                      id:
-                        type: string
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                AuthenticationError:
-                  $ref: "#/components/examples/AuthenticationError"
-        403:
-          description: Invalid APIKEY
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                APIKEYNotRegistered:
-                  $ref: "#/components/examples/APIKEYNotRegistered"
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: "1"
+                          nama:
+                            type: string
+                            example: "Abraham Billy Marawali"
+                          nis:
+                            type: string
+                            example: "123465879"
         404:
-          description: Student not found
+          description: Student not registered
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+              example: {
+                "success": false,
+                "code": 404,
+                "error": {
+                  "message": "Student is not registered",
+                  "code": "STUDENT_NOT_REGISTERED"
+                }
+              }
+  /whatsapp:
+    get:
+      summary: Get whatsapp state
+      tags:
+        - whatsapp
+      responses:
+        200:
+          description: Successful get whatsapp state
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
+                    properties:
+                      data:
+                        oneOf:
+                          - $ref: "#/components/schemas/WhatsAppNotLogedIn"
+                          - $ref: "#/components/schemas/WhatsAppLogedIn"
               examples:
-                StudentNotFound:
+                notLogedIn:
                   value: {
-                    "success": false,
-                    "code": 404,
-                    "error": {
-                      "message": "Student not found",
-                      "code": "STUDENT_NOT_FOUND"
+                    "success": true,
+                    "code": 200,
+                    "data": {
+                      "isReady": false,
+                      "qrcode": "base64:image/png,..."
                     }
                   }
-
+                logedIn:
+                  value: {
+                    "success": true,
+                    "code": 200,
+                    "data": {
+                      "isReady": true,
+                      "user": {
+                        "id": "6281234567890:2@s.whatsapp.net",
+                        "name": "[bot]"
+                      }
+                    }
+                  }
+            text/event-stream:
+              schema:
+                type: string
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: "#/components/schemas/WhatsAppNotLogedIn"
+                      - $ref: "#/components/schemas/WhatsAppLogedIn"
+              examples:
+                notLogedIn:
+                  value: "data: {\"isReady\":false,\"qrcode\":\"base64:image/png,...\"}"
+                logedIn:
+                  value: "data: {\"isReady\":true,\"user\":{\"id\":\"6281234567890:2@s.whatsapp.net\",\"name\":\"[bot]\"}}"
+  /on-whatsapp/{number}:
+    parameters:
+      - in: path
+        name: number
+        required: true
+        schema:
+          type: string
+          pattern: '\d{10,13}'
+    get:
+      summary: Get is number registered
+      tags:
+        - whatsapp
+      responses:
+        200:
+          description: Number is registered
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/WhatsAppIsRegistered"
+              example: {
+                "success": true,
+                "code": 200,
+                "data": {
+                  "number": "08123456789",
+                  "prettifiedNumber": "628123456789",
+                  "jid": "628123456789@s.whatsapp.net",
+                  "isRegistered": true
+                }
+              }
+        400:
+          description: Invalid number
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example: {
+                "success": false,
+                "code": 400,
+                "error": {
+                  "message": "\"number\" is invalid",
+                  "code": "INVALID_DATA"
+                }
+              }
+        404:
+          description: Number not registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example: {
+                "success": false,
+                "code": 404,
+                "error": {
+                  "message": "\"number\" is not registered",
+                  "code": "NUMBER_NOT_REGISTERED"
+                }
+              }
+  /presence:
+    get:
+      summary: Get list of students attended today
+      tags:
+        - attendance
+      responses:
+        200:
+          description: Successful get list of students
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/AttendedStudent"
+              example: {
+                "success": true,
+                "code": 200,
+                "data": [
+                  {
+                    "studentId": "2",
+                    "masuk": "06:00",
+                    "status": "tepat",
+                    "pulang": "16:30"
+                  },
+                  {
+                    "studentId": "3",
+                    "masuk": "06:00",
+                    "status": "tepat",
+                    "pulang": "17:30"
+                  }
+                ]
+              }
+            text/event-stream:
+              schema:
+                type: string
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AttendedStudent"
+              example: "data: [{\"studentId\":\"2\",\"masuk\":\"06:00\",\"status\":\"tepat\",\"pulang\":\"16:30\"}, {\"studentId\":\"3\",\"masuk\":\"06:00\",\"status\":\"tepat\",\"pulang\":\"17:30\"}]"
+    post:
+      summary: Presence a tag
+      tags:
+        - attendance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tag:
+                  type: string
+                  pattern: '(-\w{2}){4}'
+                  example: -A0-4G-33-FE
+                time:
+                  type: string
+                  minLength: 5
+                  maxLength: 5
+                  pattern: '([01][0-9]|2[0-3]):([0-5][0-9])'
+                  example: "06:00"
+                month:
+                  type: string
+                  example: "januari"
+                date:
+                  type: string
+                  example: "1"
+              required:
+                - tag
+                - time
+                - month
+                - date
+      responses:
+        200:
+          description: Successful do attendance
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - type: object
+                    properties:
+                      data:
+                        oneOf:
+                          - $ref: "#/components/schemas/Card"
+                          - $ref: "#/components/schemas/AttendedStudent"
+              example: {
+                "success": true,
+                "code": 200,
+                "data": {
+                  "studentId": "2",
+                  "status": "tepat",
+                  "masuk": "06:00"
+                }
+              }
 components:
-  examples:
-    AuthenticationError:
-      value: {
-        "success": false,
-        "code": 401,
-        "error": {
-          "message": "APIKEY not stored",
-          "code": "NOT_AUTHENTICATED"
-        }
-      }
-    APIKEYNotRegistered:
-      value: {
-        "success": false,
-        "code": 403,
-        "error": {
-          "message": "APIKEY not registered",
-          "code": "APIKEY_NOT_REGISTERED"
-        }
-      }
-    FirebaseErrorStream:
-      value: {
-        "success": false,
-        "code": 500,
-        "error": {
-          "message": "Failed stream to Firebase",
-          "code": "FIREBASE_STREAM_ERROR"
-        }
-      }
-    StudentWithCard:
-      value: {
-        "nis": "222310344",
-        "nama": "Naveta Candra Chairullah",
-        "alamat": "Pasar Kemis, Tangerang, Banten",
-        "telSiswa": "08123456789",
-        "telWaliMurid": "0812345678910",
-        "telWaliKelas": "081234567891011",
-        "kelas": "11 RPL1",
-        "card": "-A8-SS-DF-GH"
-      }
-    StudentWithoutCard:
-      value: {
-        "nis": "222310344",
-        "nama": "Naveta Candra Chairullah",
-        "alamat": "Pasar Kemis, Tangerang, Banten",
-        "telSiswa": "08123456789",
-        "telWaliMurid": "0812345678910",
-        "telWaliKelas": "081234567891011",
-        "kelas": "11 RPL1"
-      }
-
   schemas:
+    Student:
+      type: object
+      properties:
+        nis:
+          type: string
+        nama:
+          type: string
+        email:
+          type: string
+        kelas:
+          type: string
+        alamat:
+          type: string
+        telSiswa:
+          type: string
+        telWaliMurid:
+          type: string
+        telWaliKelas:
+          type: string
+        card:
+          type: string
+          pattern: '/(-\w{2}){4}/'
+          nullable: true
+      required:
+        - nama
+        - email
+        - kelas
+        - alamat
+        - telSiswa
+        - telWaliMurid
+        - telWaliKelas
+    Mode:
+      type: object
+      properties:
+        mode:
+          type: string
+          pattern: 'add|presence'
+    ScheduleDetail:
+      type: object
+      properties:
+        masukStart:
+          type: string
+          minLength: 5
+          maxLength: 5
+          pattern: '([01][0-9]|2[0-3]):([0-5][0-9])'
+        masukEnd:
+          type: string
+          minLength: 5
+          maxLength: 5
+          pattern: '([01][0-9]|2[0-3]):([0-5][0-9])'
+        pulangStart:
+          type: string
+          minLength: 5
+          maxLength: 5
+          pattern: '([01][0-9]|2[0-3]):([0-5][0-9])'
+        pulangEnd:
+          type: string
+          minLength: 5
+          maxLength: 5
+          pattern: '([01][0-9]|2[0-3]):([0-5][0-9])'
+      required:
+        - masukStart
+        - masukEnd
+        - pulangStart
+        - pulangEnd
     Schedule:
       type: object
       properties:
-        masukAwal:
+        month:
+          type: string
+          maxLength: 2
+        date:
+          type: string
+          maxLength: 2
+        isActive:
+          type: boolean
+      required:
+        - month
+        - date
+        - isActive
+    ScheduleWithId:
+      allOf:
+        - type: object
+          properties:
+            _id:
+              type: string
+          required:
+            - _id
+        - $ref: "#/components/schemas/Schedule"
+    AttendedStudent:
+      type: object
+      properties:
+        studentId:
+          type: string
+        masuk:
           type: string
           minLength: 5
+          maxLength: 5
           pattern: '([01][0-9]|2[0-3]):([0-5][0-9])'
-        masukAkhir:
+        pulang:
           type: string
           minLength: 5
+          maxLength: 5
           pattern: '([01][0-9]|2[0-3]):([0-5][0-9])'
-        pulangAwal:
+        status:
           type: string
           minLength: 5
-          pattern: '([01][0-9]|2[0-3]):([0-5][0-9])'
-        pulangAkhir:
+          maxLength: 5
+          pattern: 'tepat|telat'
+      required:
+        - studentId
+    Card:
+      type: object
+      properties:
+        _id:
           type: string
-          minLength: 5
-          pattern: '([01][0-9]|2[0-3]):([0-5][0-9])'
-    WhatsAppGuest:
+        tag:
+          type: string
+          pattern: '/(-\w{2}){4}/'
+      required:
+        - tag
+    WhatsAppNotLogedIn:
       type: object
       properties:
         isReady:
@@ -1009,7 +973,8 @@ components:
           default: false
         qrcode:
           type: string
-    WhatsAppLoggedIn:
+          example: "base64:image/png,..."
+    WhatsAppLogedIn:
       type: object
       properties:
         isReady:
@@ -1018,61 +983,33 @@ components:
         user:
           type: object
           properties:
+            id:
+              type: string
+              example: "6281234567890:2@s.whatsapp.net"
             name:
               type: string
-            phone:
-              type: number
-            profilePic:
-              type: string
+              example: "[bot]"
     WhatsAppIsRegistered:
       type: object
       properties:
-        success:
+        number:
+          type: string
+        prettifiedNumber:
+          type: string
+        jid:
+          type: string
+        isRegistered:
           type: boolean
-        code:
-          type: number
-        data:
-          type: object
-          properties:
-            number:
-              type: string
-            prettifiedNumber:
-              type: string
-            isRegistered:
-              type: boolean
-    Student:
-      type: object
-      properties:
-        nis:
-          type: string
-          minLength: 1
-        nama:
-          type: string
-          minLength: 1
-        alamat:
-          type: string
-          minLength: 1
-        telSiswa:
-          type: string
-          minLength: 1
-        telWaliMurid:
-          type: string
-          minLength: 1
-        telWaliKelas:
-          type: string
-          minLength: 1
-        kelas:
-          type: string
-          minLength: 1
-        card:
-          type: string
-          nullable: true
+      required:
+        - number
+        - prettifiedNumber
+        - jid
+        - isRegistered
     ErrorResponse:
       type: object
       properties:
         success:
           type: boolean
-          default: false
         code:
           type: number
         error:
@@ -1082,3 +1019,19 @@ components:
               type: string
             code:
               type: string
+          required:
+            - message
+            - code
+      required:
+        - success
+        - code
+        - error
+    Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        code:
+          type: number
+        data:
+          type: object
