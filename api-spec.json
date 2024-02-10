@@ -311,12 +311,36 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
-                "example": {
-                  "success": false,
-                  "code": 400,
-                  "error": {
-                    "message": "\"masukStart\" is invalid",
-                    "code": "INVALID_DATA"
+                "examples": {
+                  "masukStartRequired": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "\"masukStart\" is required",
+                        "code": "INVALID_DATA"
+                      }
+                    }
+                  },
+                  "masukStartLength": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "\"masukStart\" length must be 5 character long",
+                        "code": "INVALID_DATA"
+                      }
+                    }
+                  },
+                  "masukStartTimePattern": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "\"masukStart\" is fails to match required pattern /^([01][0-9]|2[0-3]:[0-5][0-9])$/",
+                        "code": "INVALID_DATA"
+                      }
+                    }
                   }
                 }
               }
@@ -434,7 +458,7 @@
                     }
                   ]
                 },
-                "example": {
+                "examples": {
                   "success": true,
                   "code": 200,
                   "data": [
@@ -462,12 +486,66 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
-                "example": {
-                  "success": false,
-                  "code": 400,
-                  "error": {
-                    "message": "\"month\" is required",
-                    "code": "INVALID_DATA"
+                "examples": {
+                  "monthRequired": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "\"month\" is required",
+                        "code": "INVALID_DATA"
+                      }
+                    }
+                  },
+                  "monthPattern": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "\"month\" fails to match the required pattern /^(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)$/",
+                        "code": "INVALID_DATA"
+                      }
+                    }
+                  },
+                  "dateRequired": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "\"date\" is required",
+                        "code": "INVALID_DATA"
+                      }
+                    }
+                  },
+                  "datePattern": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "\"date\" fails to match the required pattern /^(?:0?[1-9]|[12][0-9]|3[01])$/",
+                        "code": "INVALID_DATA"
+                      }
+                    }
+                  },
+                  "isActiveRequired": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "\"isActive\" is required",
+                        "code": "INVALID_DATA"
+                      }
+                    }
+                  },
+                  "isActiveBoolean": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "\"isActive\" is must be boolean",
+                        "code": "INVALID_DATA"
+                      }
+                    }
                   }
                 }
               }
@@ -660,12 +738,55 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
-                "example": {
-                  "success": false,
-                  "code": 400,
-                  "error": {
-                    "message": "nis already registered",
-                    "code": "NIS_ALREADY_REGISTERED"
+                "examples": {
+                  "nisRequired": {
+                    "$ref": "#/components/examples/nisRequired"
+                  },
+                  "namaRequired": {
+                    "$ref": "#/components/examples/namaRequired"
+                  },
+                  "emailRequired": {
+                    "$ref": "#/components/examples/emailRequired"
+                  },
+                  "emailInvalid": {
+                    "$ref": "#/components/examples/emailInvalid"
+                  },
+                  "kelasRequired": {
+                    "$ref": "#/components/examples/kelasRequired"
+                  },
+                  "alamatRequired": {
+                    "$ref": "#/components/examples/alamatRequired"
+                  },
+                  "telSiswaRequired": {
+                    "$ref": "#/components/examples/telSiswaRequired"
+                  },
+                  "telSiswaPattern": {
+                    "$ref": "#/components/examples/telSiswaPattern"
+                  },
+                  "telWaliMuridRequired": {
+                    "$ref": "#/components/examples/telWaliMuridRequired"
+                  },
+                  "telWaliMuridPattern": {
+                    "$ref": "#/components/examples/telWaliMuridPattern"
+                  },
+                  "telWaliKelasRequired": {
+                    "$ref": "#/components/examples/telWaliKelasRequired"
+                  },
+                  "telWaliKelasPattern": {
+                    "$ref": "#/components/examples/telWaliKelasPattern"
+                  },
+                  "cardPattern": {
+                    "$ref": "#/components/examples/cardPattern"
+                  },
+                  "nisAlreadyRegsitered": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "nis already registered",
+                        "code": "NIS_ALREADY_REGISTERED"
+                      }
+                    }
                   }
                 }
               }
@@ -822,12 +943,45 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
-                "example": {
-                  "success": false,
-                  "code": 400,
-                  "error": {
-                    "message": "\"email\" is required",
-                    "code": "INVALID_DATA"
+                "examples": {
+                  "nisRequired": {
+                    "$ref": "#/components/examples/nisRequired"
+                  },
+                  "namaRequired": {
+                    "$ref": "#/components/examples/namaRequired"
+                  },
+                  "emailRequired": {
+                    "$ref": "#/components/examples/emailRequired"
+                  },
+                  "emailInvalid": {
+                    "$ref": "#/components/examples/emailInvalid"
+                  },
+                  "kelasRequired": {
+                    "$ref": "#/components/examples/kelasRequired"
+                  },
+                  "alamatRequired": {
+                    "$ref": "#/components/examples/alamatRequired"
+                  },
+                  "telSiswaRequired": {
+                    "$ref": "#/components/examples/telSiswaRequired"
+                  },
+                  "telSiswaPattern": {
+                    "$ref": "#/components/examples/telSiswaPattern"
+                  },
+                  "telWaliMuridRequired": {
+                    "$ref": "#/components/examples/telWaliMuridRequired"
+                  },
+                  "telWaliMuridPattern": {
+                    "$ref": "#/components/examples/telWaliMuridPattern"
+                  },
+                  "telWaliKelasRequired": {
+                    "$ref": "#/components/examples/telWaliKelasRequired"
+                  },
+                  "telWaliKelasPattern": {
+                    "$ref": "#/components/examples/telWaliKelasPattern"
+                  },
+                  "cardPattern": {
+                    "$ref": "#/components/examples/cardPattern"
                   }
                 }
               }
@@ -1062,12 +1216,26 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
-                "example": {
-                  "success": false,
-                  "code": 400,
-                  "error": {
-                    "message": "\"number\" is invalid",
-                    "code": "INVALID_DATA"
+                "examples": {
+                  "numberNotRegistered": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "\"number\" is invalid",
+                        "code": "INVALID_PHONENUMBER"
+                      }
+                    }
+                  },
+                  "notReady": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "WhatsApp not ready yet",
+                        "code": "WHATSAPP_NOT_READY"
+                      }
+                    }
                   }
                 }
               }
@@ -1086,6 +1254,67 @@
                   "error": {
                     "message": "\"number\" is not registered",
                     "code": "NUMBER_NOT_REGISTERED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/whatsapp/logout": {
+      "get": {
+        "summary": "Log out whatsapp",
+        "tags": [
+          "whatsapp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful logout WhatsApp",
+            "content": {
+              "appliaction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"  
+                },
+                "example": {
+                  "success": true,
+                  "code": 200,
+                  "data": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "WhatsApp not ready",
+            "content": {
+              "appliaction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "code": 400,
+                  "error": {
+                    "message": "WhatsApp not ready yet",
+                    "code": "WHATSAPP_NOT_READY"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed logout WhatsApp",
+            "content": {
+              "appliaction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "code": 500,
+                  "error": {
+                    "message": "WhatsApp failed to logout",
+                    "code": "WHATSAPP_FAILED_LOGOUT"
                   }
                 }
               }
@@ -1230,13 +1459,115 @@
                     }
                   ]
                 },
+                "examples": {
+                  "addMode": {
+                    "value": {
+                      "success": true,
+                      "code": 200,
+                      "data": {
+                        "_id": "123456789",
+                        "tag": "-A0-BF-G7-FF"
+                      }
+                    }
+                  },
+                  "presenceMode": {
+                    "success": true,
+                    "code": 200,
+                    "data": {
+                      "studentId": "2",
+                      "status": "tepat",
+                      "masuk": "06:00"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed presence",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "alreadyAttended": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "Student already attended",
+                        "code": "STUDENT_ALREADY_ATTENDED"
+                      }
+                    }
+                  },
+                  "alreadyGoHome": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "Student already home",
+                        "code": "STUDENT_ALREADY_HOME"
+                      }
+                    }
+                  },
+                  "cardAlreadyAdded": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "Card already added",
+                        "code": "CARD_ALREADY_ADDED"
+                      }
+                    }
+                  },
+                  "cardAlreadyRegistered": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "Card already registered",
+                        "code": "CARD_ALREADY_REGISTERED"
+                      }
+                    }
+                  },
+                  "presenceInactive": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "Presence is inactive",
+                        "code": "PRESENCE_INACTIVE"
+                      }
+                    }
+                  },
+                  "noSchedule": {
+                    "value": {
+                      "success": false,
+                      "code": 400,
+                      "error": {
+                        "message": "Not an attendance schedule",
+                        "code": "NO_SCHEDULE"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Card not found",
+            "content": {
+              "appliaction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
                 "example": {
-                  "success": true,
-                  "code": 200,
-                  "data": {
-                    "studentId": "2",
-                    "status": "tepat",
-                    "masuk": "06:00"
+                  "success": false,
+                  "code": 404,
+                  "error": {
+                    "message": "Card tag is not registered",
+                    "code": "CARD_NOT_REGISTERED"
                   }
                 }
               }
@@ -1247,6 +1578,138 @@
     }
   },
   "components": {
+    "examples": {
+      "nisRequired": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"nis\" is required",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "namaRequired": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"nama\" is required",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "emailRequired": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"email\" is required",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "emailInvalid": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"email\" is invalid",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "alamatRequired": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"alamat\" is required",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "kelasRequired": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"kelas\" is required",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "telSiswaRequired": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"telSiswa\" is required",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "telSiswaPattern": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"telSiswa\" is fails to match required pattern /^\\d{10,14}$/",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "telWaliMuridRequired": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"telWaliMurid\" is required",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "telWaliMuridPattern": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"telWaliMurid\" is fails to match required pattern /^\\d{10,14}$/",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "telWaliKelasRequired": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"telWaliKelas\" is required",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "telWaliKelasPattern": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"telWaliKelas\" is fails to match required pattern /^\\d{10,14}$/",
+            "code": "INVALID_DATA"
+          }
+        }
+      },
+      "cardPattern": {
+        "value": {
+          "success": false,
+          "code": 400,
+          "error": {
+            "message": "\"card\" is is fails to match required pattern /^(-\\w{2}){4}$/",
+            "code": "INVALID_DATA"
+          }
+        }
+      }
+    },
     "schemas": {
       "Student": {
         "type": "object",
