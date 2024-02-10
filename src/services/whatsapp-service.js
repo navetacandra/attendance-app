@@ -54,7 +54,7 @@ class WhatsApp extends EventEmitter {
       logger: P({ enabled: false }),
       browser: Browsers.macOS('Desktop'),
       syncFullHistory: false,
-      printQRInTerminal: true,
+      printQRInTerminal: false,
     });
 
     this.client.ev.on('creds.update', saveCreds);
@@ -80,7 +80,7 @@ class WhatsApp extends EventEmitter {
         this.user = this.client.user;
       }
       
-      this.emit('connection-update', this.isReady 
+      this.emit('state', this.isReady 
         ? {isReady: this.isReady, user: this.user}
         : {isReady: this.isReady, qrcode: this.qrcode}
       );
@@ -109,6 +109,7 @@ class WhatsApp extends EventEmitter {
     try {
       const prettifiedNumber = this.prettifyNumber(number);
       const [result] = await this.client.onWhatsApp(number);
+      if(!result?.exists) throw 'NUMBER_NOT_REGISTERE';
       return {number, prettifiedNumber, jid: result?.jid || `${prettifiedNumber}@s.whatsapp.net`, isRegistered: result?.exists || false};
     } catch(err) {
       logger.error(`WhatsApp error check isRegistered for ${number}. caused: ${err.toString()}`);
