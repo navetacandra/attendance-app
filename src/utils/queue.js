@@ -6,7 +6,6 @@ class Queue {
     this.filePath = queuePath;
     this.classes = [];
     this._queue = existsSync(queuePath) ? JSON.parse(readFileSync(queuePath, 'utf8')) : [];
-    this.unqueue();
   }
 
   addClass({ _class, name }) {
@@ -15,7 +14,7 @@ class Queue {
 
   addItem({ _class, method, args, stateToStart, maxRetries }) {
     this._queue.push({
-      _class, method, args, stateToStart, maxRetries
+      _class, method, args, stateToStart, retry: 0, maxRetries
     });
   }
 
@@ -23,8 +22,8 @@ class Queue {
     const firstItem = this._queue.shift();
     const usedClass = this.classes.find(c => c.name == firstItem._class);
     if(usedClass) {
-      if(!usedClass[firstItem.method]) { 
-        if(usedClass[firstItem.stateToStart]) {
+      if(usedClass._class[firstItem.method]) { 
+        if(usedClass._class[firstItem.stateToStart]) {
           try {
             await usedClass._class[firstItem.method](...firstItem.args);
           } catch(err) {
@@ -48,12 +47,16 @@ class Queue {
   }
 
   unqueue() {
+    let locked = false;
     setInterval(async () => {
-      if(this._queue.length) {
+      if(this._queue.length && !locked) {
         try {
+          locked = true;
           await this.unqueueItem();
         } catch(err) {
           logger.error(`Failed to unqueue item. caused: ${err}`);
+        } finally {
+          locked = false;
         }
       }
     }, 100);
