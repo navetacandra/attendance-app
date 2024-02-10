@@ -37,6 +37,7 @@ export async function onWhatsappGet(req, res) {
       return res.status(400).json(new ErrorResponse(400, err.details[0].message, 'INVALID_PHONENUMBER'));
     } else {
       const errorDetail = whatsapp.errorCodes[err];
+      if(!errorDetail) return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
       return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));
     }
   }
@@ -49,6 +50,7 @@ export async function whatsappLogout(req, res) {
     return res.status(200).json(new SuccessResponse(logedout));
   } catch(err) {
     const errorDetail = whatsapp.errorCodes[err];
+    if(!errorDetail) return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
     return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));
   }
 }

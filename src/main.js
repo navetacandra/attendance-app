@@ -25,7 +25,9 @@ async function exitHandler(exitCode) {
     logger.error(`Failed run exitHandler. caused: ${err}`);
   }
 
-  process.exit(isNaN(+exitCode) ? 1 : +exitCode);
+  const code = isNaN(+exitCode) ? 1 : +exitCode;
+  logger.info(`Exit with code: ${code}`);
+  process.exit(code);
 };
 
 ["SIGINT", "SIGTERM", "unhandledRejection", "uncaughtException", "exit"]
@@ -33,7 +35,7 @@ async function exitHandler(exitCode) {
 
 (async function() {
   queue = new Queue(resolve(join(__dirname, '../queue.json')));
-  mongo = new MongoService({ appName: 'presence', mongoUrl: "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.1.3" });
+  mongo = new MongoService({ appName: 'presence', mongoUrl: "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.1.3", queue });
   whatsapp = new WhatsApp({ appName: 'presence' });
   web = express();
 

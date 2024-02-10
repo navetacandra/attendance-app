@@ -7,6 +7,7 @@ import { modeGet, modeUpdate, scheduleDetailGet, scheduleDetailUpdate, scheduleG
 import { readFileSync } from "fs";
 import { studentDeleteById, studentGetById, studentPutById, studentsGet, studentsPost } from "../controller/student.js";
 import { onWhatsappGet, whatsappGet, whatsappLogout } from "../controller/whatsapp.js";
+import { attendedList, attendedReport, presenceTagPost } from "../controller/attendance.js";
 
 const routerV1 = new Router();
 
@@ -32,5 +33,8 @@ routerV1.delete('/student/:studentId', studentDeleteById);
 routerV1.get('/whatsapp', whatsappGet);
 routerV1.get('/whatsapp/logout', whatsappLogout);
 routerV1.get('/on-whatsapp/:number', onWhatsappGet);
+routerV1.get('/presence', attendedList);
+routerV1.post('/presence', presenceTagPost);
+routerV1.get('/presence-report', attendedReport);
 
 export { routerV1 as default };

@@ -51,7 +51,7 @@ export function scheduleDetailGet(req, res) {
       pulangEnd: mongo.getPresenceDetail('pulangEnd').value
     }));
   } else {
-      return res.status(400).json(new ErrorResponse(400, "Accept Content Type not supported", "NOT_SUPPORTED_CONTENT_TYPE"));
+    return res.status(400).json(new ErrorResponse(400, "Accept Content Type not supported", "NOT_SUPPORTED_CONTENT_TYPE"));
   }
 }
 
@@ -77,7 +77,7 @@ export function scheduleGet(req, res) {
   } else if(headers.accept === "application/json") {
     return res.status(200).json(new SuccessResponse(mongo.presenceSchedule));
   } else {
-      return res.status(400).json(new ErrorResponse(400, "Accept Content Type not supported", "NOT_SUPPORTED_CONTENT_TYPE"));
+    return res.status(400).json(new ErrorResponse(400, "Accept Content Type not supported", "NOT_SUPPORTED_CONTENT_TYPE"));
   }
 }
 

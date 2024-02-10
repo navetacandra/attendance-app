@@ -30,6 +30,7 @@ export function studentsPost(req, res) {
       return res.status(400).json(new ErrorResponse(400, err.details[0].message, 'INVALID_DATA'));
     } else {
       const errorDetail = mongo.errorCodes[err];
+      if(!errorDetail) return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
       return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));
     }
   }
@@ -59,6 +60,7 @@ export function studentPutById(req, res) {
       return res.status(400).json(new ErrorResponse(400, err.details[0].message, 'INVALID_DATA'));
     } else {
       const errorDetail = mongo.errorCodes[err];
+      if(!errorDetail) return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
       return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));
     }
   }
@@ -75,6 +77,7 @@ export function studentDeleteById(req, res) {
       return res.status(400).json(new ErrorResponse(400, err.details[0].message, 'INVALID_DATA'));
     } else {
       const errorDetail = mongo.errorCodes[err];
+      if(!errorDetail) return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
       return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));
     }
   }

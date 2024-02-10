@@ -18,6 +18,28 @@ const months = [
   "desember"
 ];
 
+function quickSort(arr, low = 0, high = arr.length - 1, prop) {
+  if (low < high) {
+    const pivotIndex = partition(arr, low, high, prop);
+    quickSort(arr, low, pivotIndex - 1, prop);
+    quickSort(arr, pivotIndex + 1, high, prop);
+  }
+  return arr;
+}
+
+function partition(arr, low, high, prop) {
+  const pivot = prop ? arr[high][prop] : arr[high];
+  let i = low - 1;
+  for (let j = low; j <= high - 1; j++) {
+    if ((prop ? arr[j][prop] : arr[j]) <= pivot) {
+      i++;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+  [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+  return i + 1;
+}
+
 function parseToTime(time) {
   return time.match(/([01][0-9]|2[0-4])\:([0-5][0-9])/).slice(1).map(tm => Number(tm));
 }
@@ -79,12 +101,17 @@ class MongoService extends EventEmitter {
       NO_SCHEDULE: {
         code: 400,
         message: 'Not an attendance schedule'
+      },
+      INVALID_DATE: {
+        code: 400,
+        message: 'Given date invalid or not found'
       }
     };
 
+    this.queue = queue;
     this.syncPresence = setInterval(this.syncPresencesWithSchedule, 60000);
     this.storeState = setInterval(() => {
-      queue.add({
+      this.queue.add({
         _class: 'mongo',
         method: 'saveToDatabase',
         args: [],
@@ -119,6 +146,7 @@ class MongoService extends EventEmitter {
       if(this.attended?._id != currentSchedule._id) {
         if(this.attended?._id) await this.saveToDatabase();
         this.attended = await this.db.collection('attended').findOne({ _id: currentSchedule._id });
+        this.emit('presence-update', this.attended.students);
        }
     }
   }
@@ -220,6 +248,8 @@ class MongoService extends EventEmitter {
   createStudent({ nis, nama, email, kelas, alamat, telSiswa, telWaliMurid, telWaliKelas, card }) {
     const student = this.students.find(student => student.nis == nis);
     if(student) throw `NIS_ALREADY_REGISTERED`;
+    const cardInStudent = this.students.find(student => student.card == card && student._id !== id);
+    if(cardInStudent) throw 'CARD_ALREADY_REGISTERED';
 
     const studentId = uuid().replace(/-/g, '');
     this.students.push({ 
@@ -243,6 +273,8 @@ class MongoService extends EventEmitter {
   updateStudent({ id, nis, nama, email, kelas, alamat, telSiswa, telWaliMurid, telWaliKelas, card }) {
     const studentIndex = this.students.findIndex(student => student._id == id);
     if(studentIndex < 0) throw `STUDENT_NOT_REGISTERED`;
+    const cardInStudent = this.students.find(student => student.card == card && student._id !== id);
+    if(cardInStudent) throw 'CARD_ALREADY_REGISTERED';
 
     const data = { nis, nama, email, kelas, alamat, telSiswa, telWaliMurid, telWaliKelas, card };
     for(const k of Object.keys(data)) {
@@ -260,7 +292,7 @@ class MongoService extends EventEmitter {
 
     const { _id, nis, nama } = this.students[studentIndex];
     this.students[studentIndex] = {_id, removeContent: true};
-    this.removeAttended({ id: _id });
+    this.queue.addItem({ _class: 'mongo', method: 'removeAttended', args: [{id: _id}], stateToStart: db, maxRetries: 2 });
     this.emit('students', this.students.filter(student => !student.removeContent));
     return { id: _id, nis, nama };
   }
@@ -289,7 +321,7 @@ class MongoService extends EventEmitter {
     const student = this.students.find(student => student.card == tag);
     if(!student) throw 'CARD_NOT_REGISTERED';
 
-    const studentInPresenceIndex = this.attended.attended.findIndex(student => student.studentId == student._id);
+    const studentInPresenceIndex = this.attended.students.findIndex(s => s.studentId === student._id);
     const currTime = parseToTime(time);
     const masukStart = parseToTime(this.getPresenceDetail('masukStart').value);
     const masukEnd = parseToTime(this.getPresenceDetail('masukEnd').value);
@@ -304,10 +336,10 @@ class MongoService extends EventEmitter {
         masuk: time
       };
 
-      this.attended.attended.push(presenceData);
-      this.emit('presence-update', this.attended.attended);
-      this.emit('presence-new', presenceData);
-      return presenceData;
+      this.attended.students.push(presenceData);
+      this.emit('presence-update', this.attended.students);
+      this.emit('presence-new', {...presenceData, action: 'masuk'});
+      return {...presenceData, action: 'masuk'};
     } else if(compareTime(currTime, masukEnd) > 0 && compareTime(currTime, pulangStart) < 0) {
       if(studentInPresenceIndex > -1) throw 'STUDENT_ALREADY_ATTENDED';
       const presenceData = {
@@ -316,28 +348,28 @@ class MongoService extends EventEmitter {
         masuk: time
       };
 
-      this.attended.attended.push(presenceData);
-      this.emit('presence-update', this.attended.attended);
-      this.emit('presence-new', presenceData);
-      return presenceData;
+      this.attended.students.push(presenceData);
+      this.emit('presence-update', this.attended.students);
+      this.emit('presence-new', {...presenceData, action: 'masuk'});
+      return {...presenceData, action: 'masuk'};
     } else if(compareTime(currTime, pulangStart) >= 0 && compareTime(currTime, pulangEnd) <= 0) {
-      if(studentInPresenceIndex > -1 && this.attended.attended[studentInPresenceIndex].pulang) throw 'STUDENT_ALREADY_HOME';
+      if(studentInPresenceIndex > -1 && this.attended.students[studentInPresenceIndex].pulang) throw 'STUDENT_ALREADY_HOME';
       const presenceData = {
         studentId: student._id,
         pulang: time
       };
 
       if(studentInPresenceIndex < 0) {
-        this.attended.attended.push(presenceData);
-        this.emit('presence-update', this.attended.attended);
-        this.emit('presence-new', presenceData);
-        return presenceData;
+        this.attended.students.push(presenceData);
+        this.emit('presence-update', this.attended.students);
+        this.emit('presence-new', {...presenceData, action: 'pulang'});
+        return {...presenceData, action: 'pulang'};
       }
 
-      this.attended.attended[studentInPresenceIndex].pulang = time;
-      this.emit('presence-update', this.attended.attended);
-      this.emit('presence-new', this.attended.attended[studentInPresenceIndex]);
-      return this.attended.attended[studentInPresenceIndex];
+      this.attended.students[studentInPresenceIndex].pulang = time;
+      this.emit('presence-update', this.attended.students);
+      this.emit('presence-new', {...this.attended.students[studentInPresenceIndex], action: 'pulang'});
+      return {...this.attended.students[studentInPresenceIndex], action: 'pulang'};
     } else {
       throw 'NO_SCHEDULE';
     }
@@ -346,14 +378,46 @@ class MongoService extends EventEmitter {
   async removeAttended({ id }) {
     for(const schedule of this.presenceSchedule) {
       const attended = await this.db.collection('attended').findOne({ _id: schedule._id });
-      const filteredStudents = attended.attended.filter(student => student.studentId != id);
-      await this.db.collection('attended').findOneAndReplace({ _id: schedule._id }, { ...attended, attended: filteredStudents });
+      const filteredStudents = attended.students.filter(student => student.studentId != id);
+      await this.db.collection('attended').findOneAndReplace({ _id: schedule._id }, { ...attended, students: filteredStudents });
 
       if(schedule._id == this.attended._id) {
-        this.attended = {...attended, attended: filteredStudents };
+        this.attended = {...attended, students: filteredStudents };
         this.emit('presence-update', this.attended);
       }
     }
+  }
+
+  async attendedReport({ month, dates }) {
+    const choosenDate = this.presenceSchedule.filter(schedule => schedule.month === month && dates.includes(schedule.date));
+    if(choosenDate.length != dates.length) throw 'INVALID_DATE';
+
+    const rows = [
+      ['NIS', 'NAMA', 'KELAS', 'TELEPON SISWA', 'TELEPON WALI MURID', 'TELEPON WALI KELAS', choosenDate.map(d => [d.date, '', '']).flat()].flat(2),
+      ['', '', '', '', '', '', choosenDate.map(_ => ['MASUK', 'STATUS', 'PULANG'])].flat(2)
+    ];
+
+    let attended = quickSort(choosenDate, 0, choosenDate.length -1, '_id');
+    attended = await Promise.all(
+      attended.map(cd => cd._id == this.attended._id
+        ? this.attended
+        : this.db.collection('attended').findOne({ _id: cd._id }))
+    );
+    attended = attended.map(at => at.students);
+    let students = quickSort(this.students, 0, this.students.length -1, 'nama');
+    students = quickSort(students, 0, students.length -1, 'kelas');
+
+    for (const student of students) {
+      const cols = [student?.nis ?? '-', student?.nama ?? '-', student?.kelas ?? '-', student?.telSiswa ?? '-', student?.telWaliMurid ?? '-', student?.telWaliKelas ?? '-'];
+      for (const date of attended) {
+        const studentData = date.find(sd => sd.studentId == student._id);
+        cols.push(...[studentData?.masuk ?? '-', studentData?.status ?? '-', studentData?.pulang ?? '-'])
+      }
+
+      rows.push(cols);
+    }
+
+    return rows.map(cols => cols.map(col => [col, {t: 's'}]));
   }
 }
 
