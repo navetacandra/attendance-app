@@ -13,9 +13,9 @@ class Queue {
     this.classes.push({ _class, name });
   }
 
-  addItem({ _class, method, args, executionCondition, maxRetries }) {
+  addItem({ _class, method, args, stateToStart, maxRetries }) {
     this._queue.push({
-      _class, method, args, executionCondition, maxRetries
+      _class, method, args, stateToStart, maxRetries
     });
   }
 
@@ -24,7 +24,7 @@ class Queue {
     const usedClass = this.classes.find(c => c.name == firstItem._class);
     if(usedClass) {
       if(!usedClass[firstItem.method]) { 
-        if(firstItem.executionCondition) {
+        if(usedClass[firstItem.stateToStart]) {
           try {
             await usedClass._class[firstItem.method](...firstItem.args);
           } catch(err) {
