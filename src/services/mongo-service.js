@@ -33,7 +33,7 @@ function compareTime(time1, time2) {
 }
 
 class MongoService extends EventEmitter {
-  constructor({ appName, mongoUrl }) {
+  constructor({ appName, mongoUrl, queue }) {
     super();
     this.dbName = appName;
     this.client = new MongoClient(mongoUrl);
@@ -83,7 +83,16 @@ class MongoService extends EventEmitter {
     };
 
     this.syncPresence = setInterval(this.syncPresencesWithSchedule, 60000);
-    this.storeState = setInterval(this.saveToDatabase, 60000 * 60);
+    this.storeState = setInterval(() => {
+      queue.add({
+        _class: 'mongo',
+        method: 'saveToDatabase',
+        args: [],
+        stateToStart: 'db',
+        maxRetries: 2
+      });
+    }, 60000 * 30);
+    this.initialize();
   }
 
   async initialize() {
