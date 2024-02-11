@@ -272,7 +272,7 @@ class MongoService extends EventEmitter {
   }
 
   updateStudent({ id, nis, nama, email, kelas, alamat, telSiswa, telWaliMurid, telWaliKelas, card }) {
-    const studentIndex = this.students.findIndex(student => student._id == id);
+    const studentIndex = this.students.findIndex(student => student._id == id && !student.removeContent);
     if(studentIndex < 0) throw `STUDENT_NOT_REGISTERED`;
     const cardInStudent = this.students.find(student => student.card != null && student.card == card && student._id !== id);
     if(cardInStudent) throw 'CARD_ALREADY_REGISTERED';
@@ -289,7 +289,7 @@ class MongoService extends EventEmitter {
   }
 
   deleteStudent({ id }) {
-    const studentIndex = this.students.findIndex(student => student._id == id);
+    const studentIndex = this.students.findIndex(student => student._id == id && !student.removeContent);
     if(studentIndex < 0) throw 'STUDENT_NOT_REGISTERED';
 
     const { _id, nis, nama } = this.students[studentIndex];

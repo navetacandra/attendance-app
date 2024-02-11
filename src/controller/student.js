@@ -9,11 +9,11 @@ export function studentsGet(req, res) {
   if(headers.accept === 'text/event-stream') {
     const sendResponse = students => writeResponse(res, students);
     setHeader(req, res, () => mongo.off("students", sendResponse));
-    writeResponse(res, mongo.students);
+    writeResponse(res, mongo.students.filter(f => !f.removeContent));
 
     mongo.on("students", sendResponse);
   } else if(headers.accept === 'application/json') {
-    return res.status(200).json(new SuccessResponse(mongo.students));
+    return res.status(200).json(new SuccessResponse(mongo.students.filter(f => !f.removeContent)));
   } else {
     return res.status(400).json(new ErrorResponse(400, "Accept Content Type not supported", "NOT_SUPPORTED_CONTENT_TYPE"));
   }
@@ -40,7 +40,7 @@ export function studentGetById(req, res) {
   const { mongo, params } = req;
   try {
     validate(studentIdValidation, params.studentId);
-    const student = mongo.students.find(student => student._id === params.studentId);
+    const student = mongo.students.find(student => student._id === params.studentId && !student.removeContent);
     if(!student) return res.status(404).json(new ErrorResponse(404, "Student not registered", "STUDENT_NOT_REGISTERED"));
     return res.status(200).json(new SuccessResponse(student));
   } catch(err) {
@@ -88,11 +88,11 @@ export function cardsGet(req, res) {
   if(headers.accept === 'text/event-stream') {
     const sendResponse = cards => writeResponse(res, cards);
     setHeader(req, res, () => mongo.off("cards", sendResponse));
-    writeResponse(res, mongo.cards);
+    writeResponse(res, mongo.cards.filter(f => !f.removeContent));
 
     mongo.on("cards", sendResponse);
   } else if(headers.accept === 'application/json') {
-    return res.status(200).json(new SuccessResponse(mongo.cards));
+    return res.status(200).json(new SuccessResponse(mongo.cards.filter(f => !f.removeContent)));
   } else {
     return res.status(400).json(new ErrorResponse(400, "Accept Content Type not supported", "NOT_SUPPORTED_CONTENT_TYPE"));
   }

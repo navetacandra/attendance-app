@@ -33,11 +33,11 @@ export function attendedList(req, res) {
   if (headers.accept === "text/event-stream") {
     const sendResponse = attended => writeResponse(res, attended);
     setHeader(req, res, () => mongo.off("presence-update", sendResponse));
-    writeResponse(res, mongo.attended.students);
+    writeResponse(res, mongo.attended.students.filter(f => !f.removeContent));
 
     mongo.on("presence-update", sendResponse);
   } else if(headers.accept === 'application/json') {
-    return res.status(200).json(new SuccessResponse(mongo.attended.stundets));
+    return res.status(200).json(new SuccessResponse(mongo.attended.students.filter(f => !f.removeContent)));
   } else {
     return res.status(400).json(new ErrorResponse(400, "Accept Content Type not supported", "NOT_SUPPORTED_CONTENT_TYPE"));
   }
