@@ -5,7 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { modeGet, modeUpdate, scheduleDetailGet, scheduleDetailUpdate, scheduleGet, scheduleUpdate } from "../controller/schedule.js";
 import { readFileSync } from "fs";
-import { studentDeleteById, studentGetById, studentPutById, studentsGet, studentsPost } from "../controller/student.js";
+import { cardsGet, studentDeleteById, studentGetById, studentPutById, studentsGet, studentsPost } from "../controller/student.js";
 import { onWhatsappGet, whatsappGet, whatsappLogout } from "../controller/whatsapp.js";
 import { attendedList, attendedReport, presenceTagPost } from "../controller/attendance.js";
 
@@ -30,6 +30,7 @@ routerV1.post('/students', studentsPost);
 routerV1.get('/student/:studentId', studentGetById);
 routerV1.put('/student/:studentId', studentPutById);
 routerV1.delete('/student/:studentId', studentDeleteById);
+routerV1.get('/cards', cardsGet);
 routerV1.get('/whatsapp', whatsappGet);
 routerV1.get('/whatsapp/logout', whatsappLogout);
 routerV1.get('/on-whatsapp/:number', onWhatsappGet);

@@ -196,6 +196,7 @@ class MongoService extends EventEmitter {
       this.storeStateToDatabase('presenceDetail', 'presence_detail'),
       this.storeStateToDatabase('presenceSchedule', 'presence_schedule'),
       this.storeStateToDatabase('students', 'students'),
+      this.storeStateToDatabase('cards', 'cards'),
       this.storePresencesToDatabase()
     ]);
   }
@@ -282,6 +283,7 @@ class MongoService extends EventEmitter {
         this.students[studentIndex][k] = data[k];
       }
     }
+    if(card) this.removeCard({ tag: card });
     this.emit('students', this.students.filter(student => !student.removeContent));
     return { id, nis, nama };
   }
@@ -303,21 +305,25 @@ class MongoService extends EventEmitter {
     if(card) throw 'CARD_ALREADY_ADDED';
     if(cardInStudent) throw 'CARD_ALREADY_REGISTERED';
 
-    const data = {_id: uuid().replace(/-/g, ''), tag};
-    this.emit('cards', this.cards);
+    const data = {_id: uuid().replace(/-/g, ''), tag, isNewData: true};
+    this.cards.push(data);
+    this.emit('cards', this.cards.filter(card => !card.removeContent));
     return data;
   }
 
   removeCard({ tag }) {
-    this.cards = this.cards.filter(card => card.tag != tag);
-    this.emit('cards', this.cards);
+    const cardIndex = this.cards.findIndex(card => card.tag == tag);
+    if(cardIndex > -1) {
+      this.cards[cardIndex] = {_id: this.cards[cardIndex], removeContent: true};
+    }
+    this.emit('cards', this.cards.filter(card => !card.removeContent));
     return { tag };
   }
 
   presenceTag({ tag, time, month, date }) {
     const presenceDate = this.presenceSchedule.find(schedule => schedule.month == month && schedule.date == date);
     if(!presenceDate || !presenceDate.isActive) throw 'PRESENCE_INACTIVE';
-
+ 
     const student = this.students.find(student => student.card == tag);
     if(!student) throw 'CARD_NOT_REGISTERED';
 

@@ -47,8 +47,14 @@ export function presenceTagPost(req, res) {
   const { mongo, body } = req;
   try {
     const result = validate(attendanceValidation, body);
-    const presence = mongo.presenceTag(result);
-    return res.status(200).json(new SuccessResponse(presence));
+    const mode = mongo.getPresenceDetail("mode").value;
+    if(mode == "add") {
+      const add = mongo.addCard({ tag: result.tag });
+      return res.status(200).json(new SuccessResponse(add));
+    } else {
+      const presence = mongo.presenceTag(result);
+      return res.status(200).json(new SuccessResponse(presence));
+    }
   } catch(err) {
     if(err._original) {
       return res.status(400).json(new ErrorResponse(400, err.details[0].message, 'INVALID_DATA'));

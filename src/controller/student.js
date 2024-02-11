@@ -82,3 +82,18 @@ export function studentDeleteById(req, res) {
     }
   }
 }
+
+export function cardsGet(req, res) {
+  const { mongo, headers } = req;
+  if(headers.accept === 'text/event-stream') {
+    const sendResponse = cards => writeResponse(res, cards);
+    setHeader(req, res, () => mongo.off("cards", sendResponse));
+    writeResponse(res, mongo.cards);
+
+    mongo.on("cards", sendResponse);
+  } else if(headers.accept === 'application/json') {
+    return res.status(200).json(new SuccessResponse(mongo.cards));
+  } else {
+    return res.status(400).json(new ErrorResponse(400, "Accept Content Type not supported", "NOT_SUPPORTED_CONTENT_TYPE"));
+  }
+}
