@@ -111,7 +111,7 @@ class MongoService extends EventEmitter {
     this.queue = queue;
     this.syncPresence = setInterval(this.syncPresencesWithSchedule, 60000);
     this.storeState = setInterval(() => {
-      this.queue.add({
+      this.queue.addItem({
         _class: 'mongo',
         method: 'saveToDatabase',
         args: [],
@@ -249,7 +249,7 @@ class MongoService extends EventEmitter {
   createStudent({ nis, nama, email, kelas, alamat, telSiswa, telWaliMurid, telWaliKelas, card }) {
     const student = this.students.find(student => student.nis == nis);
     if(student) throw `NIS_ALREADY_REGISTERED`;
-    const cardInStudent = this.students.find(student => student.card == card && student._id !== id);
+    const cardInStudent = this.students.find(student => student.card != null && student.card == card);
     if(cardInStudent) throw 'CARD_ALREADY_REGISTERED';
 
     const studentId = uuid().replace(/-/g, '');
@@ -274,7 +274,7 @@ class MongoService extends EventEmitter {
   updateStudent({ id, nis, nama, email, kelas, alamat, telSiswa, telWaliMurid, telWaliKelas, card }) {
     const studentIndex = this.students.findIndex(student => student._id == id);
     if(studentIndex < 0) throw `STUDENT_NOT_REGISTERED`;
-    const cardInStudent = this.students.find(student => student.card == card && student._id !== id);
+    const cardInStudent = this.students.find(student => student.card != null && student.card == card && student._id !== id);
     if(cardInStudent) throw 'CARD_ALREADY_REGISTERED';
 
     const data = { nis, nama, email, kelas, alamat, telSiswa, telWaliMurid, telWaliKelas, card };
@@ -294,7 +294,7 @@ class MongoService extends EventEmitter {
 
     const { _id, nis, nama } = this.students[studentIndex];
     this.students[studentIndex] = {_id, removeContent: true};
-    this.queue.addItem({ _class: 'mongo', method: 'removeAttended', args: [{id: _id}], stateToStart: db, maxRetries: 2 });
+    this.queue.addItem({ _class: 'mongo', method: 'removeAttended', args: [{id: _id}], stateToStart: 'db', maxRetries: 2 });
     this.emit('students', this.students.filter(student => !student.removeContent));
     return { id: _id, nis, nama };
   }

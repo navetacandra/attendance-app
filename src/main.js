@@ -14,7 +14,10 @@ const days = 'Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu'.split(',');
 const months = 'Januari,Februari,Maret,April,Mei,Juni,Juli,Agustus,September,Oktober,November,Desember'.split(',');
 let queue, mongo, whatsapp, web;
 
-async function exitHandler(exitCode) {
+async function exitHandler(ev, exitCode) {
+  const code = isNaN(exitCode) ? 1 : exitCode;
+  logger.info(`Exit triggered from ${ev}. caused: ${exitCode} with code: ${code}`);
+  
   try {
     logger.info('MongoDB saving state..');
     await mongo?.saveToDatabase();
@@ -27,13 +30,11 @@ async function exitHandler(exitCode) {
     logger.error(`Failed run exitHandler. caused: ${err}`);
   }
 
-  const code = isNaN(+exitCode) ? 1 : +exitCode;
-  logger.info(`Exit with code: ${code}`);
   process.exit(code);
 };
 
 ["SIGINT", "SIGTERM", "unhandledRejection", "uncaughtException", "exit"]
-  .forEach(ev => process.on(ev, exitHandler));
+  .forEach(ev => process.on(ev, exitCode => exitHandler(ev, exitCode)));
 
 (async function() {
   queue = new Queue(resolve(join(__dirname, '../queue.json')));
