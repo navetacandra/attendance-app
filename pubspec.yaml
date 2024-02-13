@@ -20,6 +20,7 @@ dependencies:
   permission_handler: ^11.2.1
   ez_validator: ^0.3.3
   art_sweetalert: ^0.0.5
+  sliding_up_panel: ^2.0.0+1
 
 dev_dependencies: 
   flutter_lints: ^3.0.1

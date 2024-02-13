@@ -11,16 +11,6 @@ class StudentsController extends GetxController {
   final RxMap selectedStudent = {}.obs;
 
   @override
-  void onInit() {
-    super.onInit();
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
   void onClose() {
     super.onClose();
     studentStream.close();
@@ -39,7 +29,8 @@ class StudentsController extends GetxController {
     );
   }
 
-  void deleteStudent(BuildContext context) async {
+  void deleteStudent() async {
+    final context = Get.context as BuildContext;
     try {
       final result =
           await HttpController.delete("/student/${selectedStudent["_id"]}");
@@ -65,7 +56,6 @@ class StudentsController extends GetxController {
         });
       }
     } catch (e) {
-      print(e);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showAlert(
           context,

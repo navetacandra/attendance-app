@@ -8,16 +8,6 @@ class CardsController extends GetxController {
   final selectedCard = {}.obs;
 
   @override
-  void onInit() {
-    super.onInit();
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
   void onClose() {
     super.onClose();
     cardsStream.close();

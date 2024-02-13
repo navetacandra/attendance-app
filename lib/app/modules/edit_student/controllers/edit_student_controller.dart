@@ -18,11 +18,6 @@ class EditStudentController extends GetxController {
   };
   final RxMap formErrors = {}.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
-
   Future<bool> getStudent(BuildContext context) async {
     final response =
         await HttpController.get("/student/${Get.arguments["id"]}");
@@ -50,16 +45,6 @@ class EditStudentController extends GetxController {
     }
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
   void showAlert(BuildContext context, String title, String text,
       ArtSweetAlertType type, Function onDispose) {
     ArtSweetAlert.show(
@@ -84,11 +69,11 @@ class EditStudentController extends GetxController {
     final dataStudent = Student.fromJSON(data);
     final validated = dataStudent.validate();
     if (validated["errors"] != null) {
-      Map<String, dynamic> _formErrors = {};
+      Map<String, dynamic> tmpFormErrors = {};
       for (var key in dataKeys) {
-        _formErrors[key] = validated["errors"][key];
+        tmpFormErrors[key] = validated["errors"][key];
       }
-      formErrors.value = _formErrors;
+      formErrors.value = tmpFormErrors;
     } else {
       final result =
           await HttpController.put("/student/${Get.arguments["id"]}", dataStudent.toJSON());

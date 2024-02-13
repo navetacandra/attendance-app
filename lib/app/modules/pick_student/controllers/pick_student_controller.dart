@@ -85,16 +85,6 @@ class PickStudentController extends GetxController {
     formControllers["telWaliMurid"]!.text = student["telWaliMurid"];
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
   void showAlert(BuildContext context, String title, String text,
       ArtSweetAlertType type, Function onDispose) {
     ArtSweetAlert.show(

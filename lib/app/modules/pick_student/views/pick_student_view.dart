@@ -1,6 +1,3 @@
-import 'dart:ffi';
-
-import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/pick_student_controller.dart';
@@ -40,6 +37,7 @@ class PickStudentView extends GetView<PickStudentController> {
                       items: selfC.buildMenu(),
                       value: selfC.selectedStudent["_id"] == null
                           ? null
+                          // ignore: invalid_use_of_protected_member
                           : selfC.selectedStudent.value,
                       onChanged: (student) => selfC
                           .changeSelection(student as Map<String, dynamic>),

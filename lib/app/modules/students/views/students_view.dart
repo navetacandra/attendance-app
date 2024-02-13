@@ -221,7 +221,7 @@ class StudentsView extends GetView<StudentsController> {
                 deleteButtonPressed.value = true;
                 await Future.delayed(const Duration(milliseconds: 225));
                 deleteButtonPressed.value = false;
-                selfC.deleteStudent(context);
+                selfC.deleteStudent();
               },
               child: Obx(
                 () => Container(
