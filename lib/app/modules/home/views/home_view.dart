@@ -39,14 +39,18 @@ class HomeView extends GetView<HomeController> {
                   child: const Text("STUDENTS"),
                   onPressed: () {
                     Get.toNamed(Routes.STUDENTS);
-                    // _pc.open();
                   },
                 ),
                 ElevatedButton(
                   child: const Text("CARDS"),
                   onPressed: () {
-                    Get.toNamed(Routes.CARDS);
-                    // _pc.open();
+                    Get.toNamed(Routes.CARDS); 
+                  },
+                ),
+                ElevatedButton(
+                  child: const Text("WHATSAPP"),
+                  onPressed: () {
+                    Get.toNamed(Routes.WHATSAPP); 
                   },
                 ),
               ],

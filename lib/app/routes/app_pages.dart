@@ -12,6 +12,8 @@ import '../modules/pick_student/bindings/pick_student_binding.dart';
 import '../modules/pick_student/views/pick_student_view.dart';
 import '../modules/students/bindings/students_binding.dart';
 import '../modules/students/views/students_view.dart';
+import '../modules/whatsapp/bindings/whatsapp_binding.dart';
+import '../modules/whatsapp/views/whatsapp_view.dart';
 
 part 'app_routes.dart';
 
@@ -50,6 +52,11 @@ class AppPages {
       name: _Paths.PICK_STUDENT,
       page: () => PickStudentView(),
       binding: PickStudentBinding(),
+    ),
+    GetPage(
+      name: _Paths.WHATSAPP,
+      page: () => WhatsappView(),
+      binding: WhatsappBinding(),
     ),
   ];
 }

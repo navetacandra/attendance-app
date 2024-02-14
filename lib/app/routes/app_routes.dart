@@ -9,6 +9,7 @@ abstract class Routes {
   static const EDIT_STUDENT = _Paths.EDIT_STUDENT;
   static const CARDS = _Paths.CARDS;
   static const PICK_STUDENT = _Paths.PICK_STUDENT;
+  static const WHATSAPP = _Paths.WHATSAPP;
 }
 
 abstract class _Paths {
@@ -19,4 +20,5 @@ abstract class _Paths {
   static const EDIT_STUDENT = '/edit-student';
   static const CARDS = '/cards';
   static const PICK_STUDENT = '/pick-student';
+  static const WHATSAPP = '/whatsapp';
 }
