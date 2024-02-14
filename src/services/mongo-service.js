@@ -62,7 +62,7 @@ class MongoService extends EventEmitter {
     this.db = null;
     this.presenceDetail = [];
     this.presenceSchedule = [];
-    this.presences = {};
+    this.attended = {};
     this.students = [];
     this.cards = [];
     this.errorCodes = {
@@ -134,6 +134,12 @@ class MongoService extends EventEmitter {
       logger.error(`Failed connect to MongoDB. caused: ${err}`);
       throw 'MONGO_FAILED_INITIALIZE';
     }
+  }
+
+  async close() {
+    if(this.db) await this.client.close();
+    clearInterval(this.syncPresence);
+    clearInterval(this.storeState);
   }
 
   async syncPresencesWithSchedule() {
