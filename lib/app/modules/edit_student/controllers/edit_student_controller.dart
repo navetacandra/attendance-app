@@ -16,27 +16,21 @@ class EditStudentController extends GetxController {
     "telWaliMurid": TextEditingController(),
     "telWaliKelas": TextEditingController(),
   };
+  var currentStudent = {};
   final RxMap formErrors = {}.obs;
 
   Future<bool> getStudent(BuildContext context) async {
-    final response =
-        await HttpController.get("/student/${Get.arguments["id"]}");
+    final response = await HttpController.get("/student/${Get.arguments["id"]}");
     if (response["code"] != 200) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(
-          context,
-          "Failed Get Student",
-          response["error"]["message"],
-          ArtSweetAlertType.danger,
-          () => Get.back(),
-        );
+        showAlert(context, "Failed Get Student", response["error"]["message"], ArtSweetAlertType.danger, () => Get.back());
       });
       return false;
     } else {
-      final responseKeys = response["data"].keys.toList();
+      currentStudent = response["data"];
       final dataKeys = formControllers.keys.toList();
 
-      for (var key in responseKeys) {
+      for (var key in currentStudent.keys.toList()) {
         if(dataKeys.contains(key)) {
           formControllers[key]!.text = response["data"][key];
         }
@@ -45,8 +39,7 @@ class EditStudentController extends GetxController {
     }
   }
 
-  void showAlert(BuildContext context, String title, String text,
-      ArtSweetAlertType type, Function onDispose) {
+  void showAlert(BuildContext context, String title, String text, ArtSweetAlertType type, Function onDispose) {
     ArtSweetAlert.show(
       context: context,
       artDialogArgs: ArtDialogArgs(
@@ -68,36 +61,41 @@ class EditStudentController extends GetxController {
     }
     final dataStudent = Student.fromJSON(data);
     final validated = dataStudent.validate();
+    
+    var errCount = 0;
+    final phones = {"telSiswa": "Telpon siswa", "telWaliMurid": "Telpon wali murid", "telWaliKelas": "Telpon wali kelas"};
+    Map<String, dynamic> tmpFormErrors = {};
+
     if (validated["errors"] != null) {
-      Map<String, dynamic> tmpFormErrors = {};
       for (var key in dataKeys) {
+        errCount++;
         tmpFormErrors[key] = validated["errors"][key];
       }
-      formErrors.value = tmpFormErrors;
-    } else {
-      final result =
-          await HttpController.put("/student/${Get.arguments["id"]}", dataStudent.toJSON());
-      if (result["code"] == 200) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          showAlert(
-            context,
-            "Student Updated",
-            "",
-            ArtSweetAlertType.success,
-            () => Get.back(),
-          );
-        });
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          showAlert(
-            context,
-            "Failed Update Student",
-            result["error"]["message"],
-            ArtSweetAlertType.danger,
-            () {},
-          );
-        });
+    }
+
+    for (var phone in phones.keys) {
+      if(tmpFormErrors[phone] != null || formControllers[phone]?.value.text == currentStudent[phone]) continue;
+      final validated = await Student.validatePhone(phones[phone] ?? "", formControllers[phone]?.value.text ?? "");
+      if(validated != null) {
+        errCount++;
+        tmpFormErrors[phone] = validated;
       }
+    }
+
+    if(errCount > 0) {
+      formErrors.value = tmpFormErrors;
+      return;
+    }
+
+    final result = await HttpController.put("/student/${Get.arguments["id"]}", dataStudent.toJSON());
+    if (result["code"] == 200) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showAlert(context, "Student Updated", "", ArtSweetAlertType.success, () => Get.back());
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showAlert(context, "Failed Update Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
+      });
     }
   }
 }

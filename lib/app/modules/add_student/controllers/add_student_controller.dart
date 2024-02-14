@@ -28,8 +28,7 @@ class AddStudentController extends GetxController {
     }
   }
 
-  void showAlert(BuildContext context, String title, String text,
-      ArtSweetAlertType type, Function onDispose) {
+  void showAlert(BuildContext context, String title, String text, ArtSweetAlertType type, Function onDispose) {
     ArtSweetAlert.show(
       context: context,
       artDialogArgs: ArtDialogArgs(
@@ -49,38 +48,44 @@ class AddStudentController extends GetxController {
     for (var key in dataKeys) {
       data[key] = formControllers[key]?.value.text;
     }
+
     final dataStudent = Student.fromJSON(data);
     final validated = dataStudent.validate();
+    
+    var errCount = 0;
+    final phones = {"telSiswa": "Telpon siswa", "telWaliMurid": "Telpon wali murid", "telWaliKelas": "Telpon wali kelas"};
+    Map<String, dynamic> tmpFormErrors = {};
+    
     if (validated["errors"] != null) {
-      Map<String, dynamic> tmpFormErrors = {};
       for (var key in dataKeys) {
+        errCount++;
         tmpFormErrors[key] = validated["errors"][key];
       }
-      formErrors.value = tmpFormErrors;
-    } else {
-      final result =
-          await HttpController.post("/students", dataStudent.toJSON());
-      if (result["code"] == 200) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          showAlert(
-            context,
-            "Student Added",
-            "",
-            ArtSweetAlertType.success,
-            () => Get.back(),
-          );
-        });
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          showAlert(
-            context,
-            "Failed Add Student",
-            result["error"]["message"],
-            ArtSweetAlertType.success,
-            () {},
-          );
-        });
+    }
+ 
+    for (var phone in phones.keys) {
+      if(tmpFormErrors[phone] != null) continue;
+      final validated = await Student.validatePhone(phones[phone] ?? "", formControllers[phone]?.value.text ?? "");
+      if(validated != null) {
+        errCount++;
+        tmpFormErrors[phone] = validated;
       }
+    }
+
+    if(errCount > 0) {
+      formErrors.value = tmpFormErrors;
+      return;
+    }
+
+    final result = await HttpController.post("/students", dataStudent.toJSON());
+    if (result["code"] == 200) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showAlert(context, "Student Added", "", ArtSweetAlertType.success, () => Get.back());
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showAlert(context, "Failed Add Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
+      });
     }
   }
 }

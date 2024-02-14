@@ -1,3 +1,4 @@
+import 'package:attendance_app/app/controllers/http_controller.dart';
 import 'package:ez_validator/ez_validator.dart';
 
 class Student {
@@ -16,6 +17,8 @@ class Student {
     "_id": EzValidator<String>(label: "_id").minLength(32, "Id tidak valid!"),
     "nis": EzValidator<String>(label: "nis")
         .required("NIS wajib di-isi!")
+        .minLength(9)
+        .maxLength(9)
         .matches(RegExp(r'^\d{9}$')),
     "nama": EzValidator<String>(label: "nama")
         .required("Nama wajib di-isi!")
@@ -38,8 +41,6 @@ class Student {
     "telWaliKelas": EzValidator<String>(label: "telWaliKelas")
         .required("Telpon wali kelas wajib di-isi")
         .phone("Telpon wali kelas tidak valid!"),
-    // "card":
-    //     EzValidator<String>(label: "card").matches(RegExp(r'^(-\w{2}){4}$')),
   });
 
   Student({
@@ -57,14 +58,14 @@ class Student {
 
   Student.fromJSON(Map<String, dynamic> json)
       : id = json["_id"] as String?,
-        nis = json["nis"] as String,
-        nama = json["nama"] as String,
-        email = json["email"] as String,
-        kelas = json["kelas"] as String,
-        alamat = json["alamat"] as String,
-        telSiswa = json["telSiswa"] as String,
-        telWaliMurid = json["telWaliMurid"] as String,
-        telWaliKelas = json["telWaliKelas"] as String,
+        nis = json["nis"] ?? "",
+        nama = json["nama"] ?? "",
+        email = json["email"] ?? "",
+        kelas = json["kelas"] ?? "",
+        alamat = json["alamat"] ?? "",
+        telSiswa = json["telSiswa"] ?? "",
+        telWaliMurid = json["telWaliMurid"] ?? "",
+        telWaliKelas = json["telWaliKelas"] ?? "",
         card = json["card"] as String?;
 
   Map<String, dynamic> toJSON() {
@@ -94,5 +95,30 @@ class Student {
     } else {
       return data;
     }
+  }
+
+  static Future<String?> validatePhone(String label, String phone) async {
+    String? result;
+    if(phone.length < 10 || phone.length > 15) result = "$label tidak valid!";
+    try {
+      final response = await HttpController.get("/on-whatsapp/$phone");
+      if(response["code"] == 200) {
+        result = null;
+      } else if(response["code"] == 400) {
+        if(response["error"]["code"] == "WHATSAPP_NOT_READY") {
+          result = "WhatsApp tidak tersedia";
+        }
+        result = "$label tidak valid!";
+      } else if(response["code"] == 404) {
+        result = "$label tidak ditemukan!";
+      } else if(response["code"] == 500) {
+        result = "Kesalahan validasi $label";
+      }
+    } catch (e) {
+      logger.e(e);
+      result = "Kesalahan validasi $label";
+    }
+    
+    return result;
   }
 }

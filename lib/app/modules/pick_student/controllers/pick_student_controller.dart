@@ -26,36 +26,29 @@ class PickStudentController extends GetxController {
     super.onInit();
     if (Get.arguments?["card"] != null) {
       card = Get.arguments["card"];
-      formControllers["card"] =
-          TextEditingController(text: Get.arguments["card"]);
+      formControllers["card"] = TextEditingController(text: Get.arguments["card"]);
     }
 
     try {
       students.value = await getStudents(Get.context as BuildContext);
     } catch (err) {
-      showAlert(Get.context as BuildContext, "Failed get students", "",
-          ArtSweetAlertType.danger, () => Get.back());
+      showAlert(Get.context as BuildContext, "Failed get students", "", ArtSweetAlertType.danger, () => Get.back());
     }
   }
 
   Future<List<Map<String, dynamic>>> getStudents(BuildContext context) async {
     final response = await HttpController.get("/students");
+  
     if (response["code"] != 200) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(
-          context,
-          "Failed Get Student",
-          response["error"]["message"],
-          ArtSweetAlertType.danger,
-          () => Get.back(),
-        );
+        showAlert(context, "Failed Get Student", response["error"]["message"], ArtSweetAlertType.danger, () => Get.back());
       });
-    } else if ((response["data"] as List).isEmpty) {
-      throw "no data";
+    } else if ((response["data"] as List).where((student) => student["card"] == null).isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showAlert(context, "Failed Get Student", "No students with no card found", ArtSweetAlertType.danger, () => Get.back());
+      });
     }
-    return (response["data"] as List)
-        .map((item) => item as Map<String, dynamic>)
-        .toList();
+    return (response["data"] as List).map((item) => item as Map<String, dynamic>).toList();
   }
 
   List<DropdownMenuItem> buildMenu() {
@@ -66,8 +59,7 @@ class PickStudentController extends GetxController {
         .map(
           (student) => DropdownMenuItem(
             value: student,
-            child:
-                Text("${student["nama"] ?? "-"} (${student["kelas"] ?? "-"})"),
+            child: Text("${student["nama"] ?? "-"} (${student["kelas"] ?? "-"})"),
           ),
         )
         .toList();
@@ -85,8 +77,7 @@ class PickStudentController extends GetxController {
     formControllers["telWaliMurid"]!.text = student["telWaliMurid"];
   }
 
-  void showAlert(BuildContext context, String title, String text,
-      ArtSweetAlertType type, Function onDispose) {
+  void showAlert(BuildContext context, String title, String text, ArtSweetAlertType type, Function onDispose) {
     ArtSweetAlert.show(
       context: context,
       artDialogArgs: ArtDialogArgs(
@@ -106,28 +97,17 @@ class PickStudentController extends GetxController {
     for (var key in dataKeys) {
       data[key] = formControllers[key]?.value.text;
     }
+    
     final dataStudent = Student.fromJSON(data);
-    final result = await HttpController.put(
-        "/student/${selectedStudent["_id"]}", dataStudent.toJSON());
+    final result = await HttpController.put("/student/${selectedStudent["_id"]}", dataStudent.toJSON());
+
     if (result["code"] == 200) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(
-          context,
-          "Student Updated",
-          "",
-          ArtSweetAlertType.success,
-          () => Get.back(),
-        );
+        showAlert(context, "Student Updated", "", ArtSweetAlertType.success, () => Get.back());
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(
-          context,
-          "Failed Update Student",
-          result["error"]["message"],
-          ArtSweetAlertType.danger,
-          () {},
-        );
+        showAlert(context, "Failed Update Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
       });
     }
   }
