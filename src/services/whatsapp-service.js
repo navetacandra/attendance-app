@@ -43,8 +43,6 @@ class WhatsApp extends EventEmitter {
         message: 'Given number is not registered WhatsApp'
       }
     };
-
-    this.initialize();
   }
 
   async initialize() {

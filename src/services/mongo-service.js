@@ -119,7 +119,6 @@ class MongoService extends EventEmitter {
         maxRetries: 2
       });
     }, 60000 * 30);
-    this.initialize();
   }
 
   async initialize() {
@@ -243,7 +242,7 @@ class MongoService extends EventEmitter {
       this.presenceSchedule[scheduleIndex].isActive = isActive;
       this.emit('schedule', this.presenceSchedule);
     }
-    return this.presenceSchedule;
+    return this.presenceSchedule[scheduleIndex];
   }
 
   createStudent({ nis, nama, email, kelas, alamat, telSiswa, telWaliMurid, telWaliKelas, card }) {
@@ -252,6 +251,7 @@ class MongoService extends EventEmitter {
     const cardInStudent = this.students.find(student => student.card != null && student.card == card);
     if(cardInStudent) throw 'CARD_ALREADY_REGISTERED';
 
+    const creationTimestamp = Date.now();
     const studentId = uuid().replace(/-/g, '');
     this.students.push({ 
       nis,
@@ -264,6 +264,8 @@ class MongoService extends EventEmitter {
       telWaliKelas,
       card: card ?? null,
       _id: studentId,
+      createdAt: creationTimestamp,
+      updatedAt: creationTimestamp,
       isNewData: true
     });
     if(card) this.removeCard({ tag: card });
@@ -277,7 +279,7 @@ class MongoService extends EventEmitter {
     const cardInStudent = this.students.find(student => student.card != null && student.card == card && student._id !== id);
     if(cardInStudent) throw 'CARD_ALREADY_REGISTERED';
 
-    const data = { nis, nama, email, kelas, alamat, telSiswa, telWaliMurid, telWaliKelas, card };
+    const data = { nis, nama, email, kelas, alamat, telSiswa, telWaliMurid, telWaliKelas, card, updatedAt: Date.now() };
     for(const k of Object.keys(data)) {
       if(data[k]) {
         this.students[studentIndex][k] = data[k];
@@ -305,7 +307,8 @@ class MongoService extends EventEmitter {
     if(card) throw 'CARD_ALREADY_ADDED';
     if(cardInStudent) throw 'CARD_ALREADY_REGISTERED';
 
-    const data = {_id: uuid().replace(/-/g, ''), tag, isNewData: true};
+    const creationTimestamp = Date.now();
+    const data = {_id: uuid().replace(/-/g, ''), tag, createdAt: creationTimestamp, updatedAt: creationTimestamp, isNewData: true};
     this.cards.push(data);
     this.emit('cards', this.cards.filter(card => !card.removeContent));
     return data;
@@ -344,7 +347,7 @@ class MongoService extends EventEmitter {
 
       this.attended.students.push(presenceData);
       this.emit('presence-update', this.attended.students);
-      this.emit('presence-new', {...presenceData, action: 'masuk'});
+      this.emit('presence-new', {...presenceData, student, action: 'masuk'});
       return {...presenceData, action: 'masuk'};
     } else if(compareTime(currTime, masukEnd) > 0 && compareTime(currTime, pulangStart) < 0) {
       if(studentInPresenceIndex > -1) throw 'STUDENT_ALREADY_ATTENDED';
@@ -356,7 +359,7 @@ class MongoService extends EventEmitter {
 
       this.attended.students.push(presenceData);
       this.emit('presence-update', this.attended.students);
-      this.emit('presence-new', {...presenceData, action: 'masuk'});
+      this.emit('presence-new', {...presenceData, student, action: 'masuk'});
       return {...presenceData, action: 'masuk'};
     } else if(compareTime(currTime, pulangStart) >= 0 && compareTime(currTime, pulangEnd) <= 0) {
       if(studentInPresenceIndex > -1 && this.attended.students[studentInPresenceIndex].pulang) throw 'STUDENT_ALREADY_HOME';
@@ -368,14 +371,14 @@ class MongoService extends EventEmitter {
       if(studentInPresenceIndex < 0) {
         this.attended.students.push(presenceData);
         this.emit('presence-update', this.attended.students);
-        this.emit('presence-new', {...presenceData, action: 'pulang'});
+        this.emit('presence-new', {...presenceData, student, action: 'pulang'});
         return {...presenceData, action: 'pulang'};
       }
 
       this.attended.students[studentInPresenceIndex].pulang = time;
       this.emit('presence-update', this.attended.students);
       this.emit('presence-new', {...this.attended.students[studentInPresenceIndex], action: 'pulang'});
-      return {...this.attended.students[studentInPresenceIndex], action: 'pulang'};
+      return {...this.attended.students[studentInPresenceIndex], student, action: 'pulang'};
     } else {
       throw 'NO_SCHEDULE';
     }
