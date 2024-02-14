@@ -1,9 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
+
+var logger = Logger(
+  printer: PrettyPrinter(
+    printTime: true,
+    methodCount: 0,
+  ),
+);
 
 class HttpController {
-  static const apiUrl = 'http://10.0.2.2:3000/api/v1';
+  static const apiUrl = 'http://127.0.0.1:3000/api/v1';
 
   static StreamController<List<Map<String, dynamic>>> streamList(String path) {
     StreamController<List<Map<String, dynamic>>> streamController =
@@ -15,6 +23,8 @@ class HttpController {
       "Cache-Control": "no-cache",
       "Connection": "keep-alive",
     });
+
+    logger.d("Start connection to $apiUrl$path");
 
     client.send(request).asStream().listen((response) {
       if (response.statusCode != 200) {
@@ -47,7 +57,9 @@ class HttpController {
       "Cache-Control": "no-cache",
       "Connection": "keep-alive",
     });
-
+    
+    logger.d("Start connection to $apiUrl$path");
+    
     client.send(request).asStream().listen((response) {
       if (response.statusCode != 200) {
         client.close();
@@ -68,23 +80,34 @@ class HttpController {
   }
 
   static Future<Map<String, dynamic>> get(String path) async {
-    http.Response response = await http
+    try {
+      http.Response response = await http
         .get(Uri.parse(apiUrl + path), headers: {"Accept": "application/json"});
-    return jsonDecode(response.body) as Map<String, dynamic>;
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } catch(err) {
+      logger.e("Error GET on $apiUrl$path: $err");
+      throw Exception(err);
+    }
   }
 
-  static Future<Map<String, dynamic>> post(
-      String path, Map<String, dynamic> body) async {
-    http.Response response =
-        await http.post(Uri.parse(apiUrl + path), body: body);
-    return jsonDecode(response.body) as Map<String, dynamic>;
+  static Future<Map<String, dynamic>> post(String path, Map<String, dynamic> body) async {
+    try {
+      http.Response response = await http.post(Uri.parse(apiUrl + path), body: body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } catch(err) {
+      logger.e("Error POST on $apiUrl$path: $err");
+      throw Exception(err);
+    }
   }
 
-  static Future<Map<String, dynamic>> put(
-      String path, Map<String, dynamic> body) async {
-    http.Response response =
-        await http.put(Uri.parse(apiUrl + path), body: body);
-    return jsonDecode(response.body) as Map<String, dynamic>;
+  static Future<Map<String, dynamic>> put(String path, Map<String, dynamic> body) async {
+    try {
+      http.Response response = await http.put(Uri.parse(apiUrl + path), body: body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } catch(err) {
+      logger.e("Error PUT on $apiUrl$path: $err");
+      throw Exception(err);
+    }
   }
 
   static Future<Map<String, dynamic>> delete(String path) async {
