@@ -6,28 +6,6 @@ import SuccessResponse from "../responses/success-response.js";
 import ErrorResponse from "../responses/error-response.js";
 import convertCsv2Xlsx from "../utils/xlsx.js";
 
-function quickSort(arr, low = 0, high = arr.length - 1, prop) {
-  if (low < high) {
-    const pivotIndex = partition(arr, low, high, prop);
-    quickSort(arr, low, pivotIndex - 1, prop);
-    quickSort(arr, pivotIndex + 1, high, prop);
-  }
-  return arr;
-}
-
-function partition(arr, low, high, prop) {
-  const pivot = prop ? arr[high][prop] : arr[high];
-  let i = low - 1;
-  for (let j = low; j <= high - 1; j++) {
-    if ((prop ? arr[j][prop] : arr[j]) <= pivot) {
-      i++;
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-  }
-  [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
-  return i + 1;
-}
-
 export function attendedList(req, res) {
   const { mongo, headers } = req;
   if (headers.accept === "text/event-stream") {
@@ -69,7 +47,6 @@ export async function attendedReport(req, res) {
   const { mongo, query } = req;
   try {
     let dates = (query.dates ?? '').split(',');
-      dates = quickSort(dates, 0, dates.length -1);
     const result = validate(attendanceReportValidation, {...query, dates});
     const report = await mongo.attendedReport(result);
     const filename = `${result.month.toUpperCase()}_${dates[0]}-${dates[dates.length -1]}_${Date.now()}.xlsx`;
