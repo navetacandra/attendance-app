@@ -10,6 +10,8 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/pick_student/bindings/pick_student_binding.dart';
 import '../modules/pick_student/views/pick_student_view.dart';
+import '../modules/schedule/bindings/schedule_binding.dart';
+import '../modules/schedule/views/schedule_view.dart';
 import '../modules/students/bindings/students_binding.dart';
 import '../modules/students/views/students_view.dart';
 import '../modules/whatsapp/bindings/whatsapp_binding.dart';
@@ -57,6 +59,11 @@ class AppPages {
       name: _Paths.WHATSAPP,
       page: () => WhatsappView(),
       binding: WhatsappBinding(),
+    ),
+    GetPage(
+      name: _Paths.SCHEDULE,
+      page: () => ScheduleView(),
+      binding: ScheduleBinding(),
     ),
   ];
 }

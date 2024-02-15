@@ -9,7 +9,7 @@ class CardsController extends GetxController {
 
   @override
   void onClose() {
-    super.onClose();
     cardsStream.close();
+    super.onClose();
   }
 }

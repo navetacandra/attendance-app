@@ -53,6 +53,12 @@ class HomeView extends GetView<HomeController> {
                     Get.toNamed(Routes.WHATSAPP); 
                   },
                 ),
+                ElevatedButton(
+                  child: const Text("SCHEDULE"),
+                  onPressed: () {
+                    Get.toNamed(Routes.SCHEDULE); 
+                  },
+                ),
               ],
             ),
           ),

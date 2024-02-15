@@ -12,12 +12,11 @@ class StudentsController extends GetxController {
 
   @override
   void onClose() {
-    super.onClose();
     studentStream.close();
+    super.onClose();
   }
 
-  void showAlert(BuildContext context, String title, String text,
-      ArtSweetAlertType type, Function onDispose) {
+  void showAlert(BuildContext context, String title, String text, ArtSweetAlertType type, Function onDispose) {
     ArtSweetAlert.show(
       context: context,
       artDialogArgs: ArtDialogArgs(
@@ -32,38 +31,19 @@ class StudentsController extends GetxController {
   void deleteStudent() async {
     final context = Get.context as BuildContext;
     try {
-      final result =
-          await HttpController.delete("/student/${selectedStudent["_id"]}");
+      final result = await HttpController.delete("/student/${selectedStudent["_id"]}");
       if (result["code"] == 200) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          showAlert(
-            context,
-            "Student Deleted",
-            "",
-            ArtSweetAlertType.success,
-            () => panelController.close(),
-          );
+          showAlert(context, "Student Deleted", "", ArtSweetAlertType.success, () => panelController.close());
         });
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          showAlert(
-            context,
-            "Failed Delete Student",
-            result["error"]["message"],
-            ArtSweetAlertType.danger,
-            () {},
-          );
+          showAlert(context, "Failed Delete Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
         });
       }
     } catch (e) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(
-          context,
-          "Failed Delete Student",
-          e.toString(),
-          ArtSweetAlertType.danger,
-          () {},
-        );
+        showAlert(context, "Failed Delete Student", e.toString(), ArtSweetAlertType.danger, () {});
       });
     }
   }

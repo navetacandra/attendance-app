@@ -10,6 +10,7 @@ abstract class Routes {
   static const CARDS = _Paths.CARDS;
   static const PICK_STUDENT = _Paths.PICK_STUDENT;
   static const WHATSAPP = _Paths.WHATSAPP;
+  static const SCHEDULE = _Paths.SCHEDULE;
 }
 
 abstract class _Paths {
@@ -21,4 +22,5 @@ abstract class _Paths {
   static const CARDS = '/cards';
   static const PICK_STUDENT = '/pick-student';
   static const WHATSAPP = '/whatsapp';
+  static const SCHEDULE = '/schedule';
 }
