@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+import cors from "cors";
 import { resolve, join, dirname } from "path";
 import { fileURLToPath } from "url";
 import addInstance from "./middleware/add-instance.js";
@@ -18,6 +19,7 @@ const web = express();
 queue.addClass({ _class: mongo, name: 'mongo' });
 queue.addClass({ _class: whatsapp, name: 'whatsapp' });
 
+web.use(cors({ origin: '*' }));
 web.use(bodyParser.urlencoded({ extended: true }));
 web.use(bodyParser.json());
 web.use((req, res, next) => addInstance(req, res, next, { instance: mongo, name: 'mongo' }));

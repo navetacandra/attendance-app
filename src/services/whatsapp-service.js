@@ -107,7 +107,7 @@ class WhatsApp extends EventEmitter {
     try {
       const prettifiedNumber = this.prettifyNumber(number);
       const [result] = await this.client.onWhatsApp(number);
-      if(!result?.exists) throw 'NUMBER_NOT_REGISTERE';
+      if(!result?.exists) throw 'NUMBER_NOT_REGISTERED';
       return {number, prettifiedNumber, jid: result?.jid || `${prettifiedNumber}@s.whatsapp.net`, isRegistered: result?.exists || false};
     } catch(err) {
       logger.error(`WhatsApp error check isRegistered for ${number}. caused: ${err.toString()}`);

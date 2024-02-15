@@ -26,6 +26,23 @@ export function whatsappGet(req, res) {
   }
 }
 
+export function whatsappQR(req, res) {
+  const { whatsapp, query } = req;
+  res.set("Content-Type", "image/png");
+  if(query.base64) {
+    return res.status(200).send(Buffer.from(query.base64, "base64"));
+  } else {
+    if(whatsapp.qrcode) {
+      return res.status(200).send(Buffer.from(whatsapp.qrcode.replace("data:image/png;base64,", ""), "base64"));
+    }
+
+    const emptyImage = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+    );
+    return res.status(200).send(emptyImage);
+  }
+}
+
 export async function onWhatsappGet(req, res) {
   const { whatsapp, params } = req;
   try {

@@ -8,7 +8,7 @@ function setHeader(req, res, closeCallback) {
 
   req.on('close', () => {
     res.end();
-    closeCallback();
+    if(closeCallback && typeof closeCallback == "function") closeCallback();
   })
 }
 

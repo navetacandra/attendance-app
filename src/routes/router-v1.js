@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import { modeGet, modeUpdate, scheduleDetailGet, scheduleDetailUpdate, scheduleGet, scheduleUpdate } from "../controller/schedule.js";
 import { readFileSync } from "fs";
 import { cardsGet, studentDeleteById, studentGetById, studentPutById, studentsGet, studentsPost } from "../controller/student.js";
-import { onWhatsappGet, whatsappGet, whatsappLogout } from "../controller/whatsapp.js";
+import { onWhatsappGet, whatsappGet, whatsappLogout, whatsappQR } from "../controller/whatsapp.js";
 import { attendedList, attendedReport, presenceTagPost } from "../controller/attendance.js";
 
 const routerV1 = new Router();
@@ -32,6 +32,7 @@ routerV1.put('/student/:studentId', studentPutById);
 routerV1.delete('/student/:studentId', studentDeleteById);
 routerV1.get('/cards', cardsGet);
 routerV1.get('/whatsapp', whatsappGet);
+routerV1.get('/whatsapp/qrcode', whatsappQR);
 routerV1.get('/whatsapp/logout', whatsappLogout);
 routerV1.get('/on-whatsapp/:number', onWhatsappGet);
 routerV1.get('/presence', attendedList);
