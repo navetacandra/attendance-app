@@ -7,14 +7,14 @@ import { setHeader, writeResponse } from "../utils/sse.js";
 export function whatsappGet(req, res) {
   const { whatsapp, headers } = req;
   if(headers.accept === "text/event-stream") {
-    const sendResponse = state => writeResponse(res, state);
-    setHeader(req, res, () => whatsapp.off("state", sendResponse));
+    const id = Date.now();
+    global.streamClients.whatsapp.push({ id, client: res });
+    setHeader(req, res, () => global.streamClients.whatsapp.splice(global.streamClients.whatsapp.findIndex(f => f.id === id), 1));
     writeResponse(res, 
       whatsapp.isReady
         ? {isReady: whatsapp.isReady, user: whatsapp.user}
         : {isReady: whatsapp.isReady, qrcode: whatsapp.qrcode}
     );
-    whatsapp.on("state", sendResponse);
   } else if(headers.accept === "application/json") {
     return res.status(200).json(new SuccessResponse(
       whatsapp.isReady
@@ -32,13 +32,8 @@ export function whatsappQR(req, res) {
   if(query.base64) {
     return res.status(200).send(Buffer.from(query.base64, "base64"));
   } else {
-    if(whatsapp.qrcode) {
-      return res.status(200).send(Buffer.from(whatsapp.qrcode.replace("data:image/png;base64,", ""), "base64"));
-    }
-
-    const emptyImage = Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
-    );
+    if(whatsapp.qrcode) return res.status(200).send(Buffer.from(whatsapp.qrcode.replace("data:image/png;base64,", ""), "base64"));
+    const emptyImage = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
     return res.status(200).send(emptyImage);
   }
 }

@@ -31,11 +31,10 @@ function partition(arr, low, high, prop) {
 export function attendedList(req, res) {
   const { mongo, headers } = req;
   if (headers.accept === "text/event-stream") {
-    const sendResponse = attended => writeResponse(res, attended);
-    setHeader(req, res, () => mongo.off("presence-update", sendResponse));
+    const id = Date.now();
+    global.streamClients.attended.push({ id, client: res });
+    setHeader(req, res, () => global.streamClients.attended.splice(global.streamClients.attended.findIndex(f => f.id === id), 1));
     writeResponse(res, mongo.attended.students.filter(f => !f.removeContent));
-
-    mongo.on("presence-update", sendResponse);
   } else if(headers.accept === 'application/json') {
     return res.status(200).json(new SuccessResponse(mongo.attended.students.filter(f => !f.removeContent)));
   } else {

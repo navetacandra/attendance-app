@@ -1,5 +1,6 @@
 import logger from "./utils/logger.js";
 import { queue, mongo, web, whatsapp } from "./application.js";
+import { sentEvents } from "./routes/router-v1.js";
 
 const days = 'Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu'.split(',');
 const months = 'Januari,Februari,Maret,April,Mei,Juni,Juli,Agustus,September,Oktober,November,Desember'.split(',');
@@ -18,6 +19,8 @@ async function exitHandler(ev, exitCode) {
     logger.info('Queue saved.');
   } catch(err) {
     logger.error(`Failed run exitHandler. caused: ${err}`);
+  } finally {
+    await mongo.close();
   }
 
   process.exit(code);
@@ -63,7 +66,8 @@ web.listen(3000, async () => {
   await mongo.initialize();
   await whatsapp.initialize();
 
-  logger.info(`Running.`);
+  logger.info("Running.");
 
+  sentEvents();
   queue.unqueue();
 });

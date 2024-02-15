@@ -3,11 +3,13 @@ import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { modeGet, modeUpdate, scheduleDetailGet, scheduleDetailUpdate, scheduleGet, scheduleUpdate } from "../controller/schedule.js";
 import { readFileSync } from "fs";
+import { mongo, whatsapp } from "../application.js";
+import { modeGet, modeUpdate, scheduleDetailGet, scheduleDetailUpdate, scheduleGet, scheduleUpdate } from "../controller/schedule.js";
 import { cardsGet, studentDeleteById, studentGetById, studentPutById, studentsGet, studentsPost } from "../controller/student.js";
 import { onWhatsappGet, whatsappGet, whatsappLogout, whatsappQR } from "../controller/whatsapp.js";
 import { attendedList, attendedReport, presenceTagPost } from "../controller/attendance.js";
+import { writeResponse } from "../utils/sse.js";
 
 const routerV1 = new Router();
 
@@ -17,6 +19,41 @@ const specs = swaggerJSDoc({
   swaggerDefinition,
   apis: [ apiSpecPath ]
 });
+
+const streamClients = {
+  "mode": [],
+  "schedule": [],
+  "scheduleDetail": [],
+  "students": [],
+  "cards": [],
+  "presence": [],
+  "whatsapp": []
+};
+global.streamClients = streamClients;
+
+function sentEvents() {
+  mongo.on("mode", mode => {
+    streamClients.mode.forEach(({ client }) => writeResponse(client, mode));
+  });
+  mongo.on("schedule", schedule => {
+    streamClients.schedule.forEach(({ client }) => writeResponse(client, schedule));
+  });
+  mongo.on("schedule-detail", detail => {
+    streamClients.scheduleDetail.forEach(({ client }) => writeResponse(client, detail));
+  });
+  mongo.on("students", students => {
+    streamClients.students.forEach(({ client }) => writeResponse(client, students));
+  });
+  mongo.on("cards", cards => {
+    streamClients.cards.forEach(({ client }) => writeResponse(client, cards));
+  });
+  mongo.on("presence-update", presence => {
+    streamClients.presence.forEach(({ client }) => writeResponse(client, presence));
+  });
+  whatsapp.on("state", whatsapp => {
+    streamClients.whatsapp.forEach(({ client }) => writeResponse(client, whatsapp))
+  });
+}
 
 routerV1.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
 routerV1.get('/mode', modeGet);
@@ -39,4 +76,4 @@ routerV1.get('/presence', attendedList);
 routerV1.post('/presence', presenceTagPost);
 routerV1.get('/presence-report', attendedReport);
 
-export { routerV1 as default };
+export { routerV1 as default, sentEvents, streamClients };

@@ -7,11 +7,10 @@ import { setHeader, writeResponse } from "../utils/sse.js";
 export function modeGet(req, res) {
   const { mongo, headers } = req;
   if (headers.accept === "text/event-stream") {
-    const sendResponse = mode => writeResponse(res, mode);
-    setHeader(req, res, () => mongo.off("mode", sendResponse));
+    const id = Date.now();
+    global.streamClients.mode.push({ id, client: res });
+    setHeader(req, res, () => global.streamClients.mode.splice(global.streamClients.mode.findIndex(f => f.id === id), 1));
     writeResponse(res, { mode: mongo.getPresenceDetail('mode').value });
-
-    mongo.on("mode", sendResponse);
   } else if(headers.accept === 'application/json') {
     return res.status(200).json(new SuccessResponse({ mode: mongo.getPresenceDetail('mode').value }));
   } else {
@@ -33,16 +32,15 @@ export function modeUpdate(req, res) {
 export function scheduleDetailGet(req, res) {
   const { mongo, headers } = req;
   if(headers.accept === "text/event-stream") {
-    const sendResponse = detail => writeResponse(res, detail);
-    setHeader(req, res, () => mongo.off("schedule-detail", sendResponse));
+    const id = Date.now();
+    global.streamClients.scheduleDetail.push({ id, client: res });
+    setHeader(req, res, () => global.streamClients.scheduleDetail.splice(global.streamClients.scheduleDetail.findIndex(f => f.id === id), 1));
     writeResponse(res, {
       masukStart: mongo.getPresenceDetail('masukStart').value,
       masukEnd: mongo.getPresenceDetail('masukEnd').value,
       pulangStart: mongo.getPresenceDetail('pulangStart').value,
       pulangEnd: mongo.getPresenceDetail('pulangEnd').value
     });
-
-    mongo.on('schedule-detail', sendResponse);
   } else if(headers.accept === "application/json") {
     return res.status(200).json(new SuccessResponse({
       masukStart: mongo.getPresenceDetail('masukStart').value,
@@ -69,11 +67,10 @@ export function scheduleDetailUpdate(req, res) {
 export function scheduleGet(req, res) {
   const { mongo, headers } = req;
   if(headers.accept === "text/event-stream") {
-    const sendResponse = schedule => writeResponse(res, schedule);
-    setHeader(req, res, () => mongo.off("schedule", sendResponse));
+    const id = Date.now();
+    global.streamClients.schedule.push({ id, client: res });
+    setHeader(req, res, () => global.streamClients.schedule.splice(global.streamClients.schedule.findIndex(f => f.id === id), 1));
     writeResponse(res, mongo.presenceSchedule);
-
-    mongo.on('schedule', sendResponse);
   } else if(headers.accept === "application/json") {
     return res.status(200).json(new SuccessResponse(mongo.presenceSchedule));
   } else {

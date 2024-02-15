@@ -7,11 +7,10 @@ import { setHeader, writeResponse } from "../utils/sse.js";
 export function studentsGet(req, res) {
   const { mongo, headers } = req;
   if(headers.accept === 'text/event-stream') {
-    const sendResponse = students => writeResponse(res, students);
-    setHeader(req, res, () => mongo.off("students", sendResponse));
+    const id = Date.now();
+    global.streamClients.students.push({ id, client: res });
+    setHeader(req, res, () => global.streamClients.students.splice(global.streamClients.students.findIndex(f => f.id === id), 1));
     writeResponse(res, mongo.students.filter(f => !f.removeContent));
-
-    mongo.on("students", sendResponse);
   } else if(headers.accept === 'application/json') {
     return res.status(200).json(new SuccessResponse(mongo.students.filter(f => !f.removeContent)));
   } else {
@@ -86,11 +85,10 @@ export function studentDeleteById(req, res) {
 export function cardsGet(req, res) {
   const { mongo, headers } = req;
   if(headers.accept === 'text/event-stream') {
-    const sendResponse = cards => writeResponse(res, cards);
-    setHeader(req, res, () => mongo.off("cards", sendResponse));
+    const id = Date.now();
+    global.streamClients.cards.push({ id, client: res });
+    setHeader(req, res, () => global.streamClients.cards.splice(global.streamClients.cards.findIndex(f => f.id === id), 1));
     writeResponse(res, mongo.cards.filter(f => !f.removeContent));
-
-    mongo.on("cards", sendResponse);
   } else if(headers.accept === 'application/json') {
     return res.status(200).json(new SuccessResponse(mongo.cards.filter(f => !f.removeContent)));
   } else {
