@@ -157,7 +157,6 @@ class MongoService extends EventEmitter {
       await this.db.collection("presence_schedule").insertMany(schedule);
     }
     if(!(await this.db.collection("attended").find().toArray()).length) {
-      let count = 0;
       const schedule = Array.from({ length: scheduleCount }).map((_, i) => {
         return {
           _id: i+1,
