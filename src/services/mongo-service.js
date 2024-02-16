@@ -104,6 +104,7 @@ class MongoService extends EventEmitter {
     try {
       await this.client.connect();
       this.db = this.client.db(this.dbName);
+      await this.createCollections();
       this.presenceDetail = await this.db.collection('presence_detail').find().toArray();
       this.presenceSchedule = await this.db.collection('presence_schedule').find().toArray();
       this.students = await this.db.collection('students').find().toArray();
@@ -119,6 +120,52 @@ class MongoService extends EventEmitter {
     if(this.db) await this.client.close();
     clearInterval(this.syncPresence);
     clearInterval(this.storeState);
+  }
+
+  async createCollections() {
+    if(!this.db) return;
+    let scheduleCount = 0;
+
+    if(!(await this.db.collection("students").find().toArray()).length) {
+      await this.db.createCollection("students");
+    }
+    if(!(await this.db.collection("cards").find().toArray()).length) {
+      await this.db.createCollection("cards");
+    }
+    
+    if(!(await this.db.collection("presence_detail").find().toArray()).length) {
+      await this.db.collection("presence_detail").insertMany([
+        {_id: 1, mode: "presence"},
+        {_id: 2, masukStart: "05:00"},
+        {_id: 3, masukEnd: "06:30"},
+        {_id: 4, pulangStart: "15:00"},
+        {_id: 5, pulangEnd: "18:00"}
+      ]);
+    }
+    if(!(await this.db.collection("presence_schedule").find().toArray()).length) {
+      let count = 0;
+      const schedule = months.map((month, i) => {
+        return Array.from({ length: i == 1 ? 29 : i < 7 ? i%2 == 0 ? 31 : 30 : i%2 == 0 ? 30 : 31 }).map((date) => {
+          return {
+            _id: scheduleCount++,
+            month: month,
+            date: date,
+            isActive: true
+          };
+        })
+      }).flat();
+      await this.db.collection("presence_schedule").insertMany(schedule);
+    }
+    if(!(await this.db.collection("attended").find().toArray()).length) {
+      let count = 0;
+      const schedule = Array.from({ length: scheduleCount }).map((_, i) => {
+        return {
+          _id: i+1,
+          students: []
+        };
+      });
+      await this.db.collection("attended").insertMany(schedule);
+    }
   }
 
   async syncPresencesWithSchedule() {
