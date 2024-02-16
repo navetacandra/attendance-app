@@ -1,8 +1,12 @@
 import supertest from "supertest";
-import { web, mongo }  from "../src/application";
+import { web, mongo }  from "../src/application.js";
 import logger from "./utils/logger";
 
 describe("Simulate students", function() {
+  let startMem = process.memoryUsage();
+  let usageMem = 0;
+  let ids = [];
+
   const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
   const generateRandomNumber = (len) => parseInt((Math.random() * 9 + 1) * Math.pow(10,len-1), 10);
   const generateRandomString = (length) => Array.from({ length }).reduce((acc) => acc + alphabet[Math.floor(Math.random() * alphabet.length)], '');
@@ -20,7 +24,14 @@ describe("Simulate students", function() {
   }));
 
   beforeAll(async () => await mongo.initialize());
-  afterAll(async () => await mongo.close());
+  afterAll(async () => {
+    logger.info({
+      startMemoryUsage: `${startMem.heapUsed / 1024 / 1024} MiB`,
+      memoryUsage: `${usageMem} MiB`,
+      totalMemoryUsage: `${(startMem.heapUsed / 1024 / 1024) + usageMem} MiB`
+    });
+    await mongo.close();
+  });
 
   it("get students", async function() {
     expect.assertions(4);
@@ -85,6 +96,7 @@ describe("Simulate students", function() {
     const lastMemory = process.memoryUsage().heapUsed / 1024/1024;
    
     logger.info({ process: "create 1000 students", startMemory, lastMemory, totalMemory: lastMemory - startMemory });
+    ids.push(...results.map(res => res.body.data.id));
     expect(results.filter(res => res.status == 200).length).toBe(1000);
     expect(results.filter(res => res.body.success == true).length).toBe(1000);
     expect(results.filter((res, i) => res.body.data.nis == data[i].nis).length).toBe(1000);
@@ -104,6 +116,7 @@ describe("Simulate students", function() {
       }))
     );
     const lastMemory = process.memoryUsage().heapUsed / 1024/1024;
+    usageMem += lastMemory - startMemory;
    
     logger.info({ process: "presence 1000 students \"hadir\"", startMemory, lastMemory, totalMemory: lastMemory - startMemory });
     expect(results.filter(res => res.status == 200).length).toBe(1000);
@@ -153,6 +166,7 @@ describe("Simulate students", function() {
       }))
     );
     const lastMemory = process.memoryUsage().heapUsed / 1024/1024;
+    usageMem += lastMemory - startMemory;
    
     logger.info({ process: "presence 1000 students \"pulang\"", startMemory, lastMemory, totalMemory: lastMemory - startMemory });
     expect(results.filter(res => res.status == 200).length).toBe(1000);
@@ -174,4 +188,31 @@ describe("Simulate students", function() {
     expect(result.body.code).toBe(400);
     expect(result.body.error.code).toBe("STUDENT_ALREADY_HOME");
   });
-})
+
+  it("delete 1000 students", async function() {
+    expect.assertions(4);
+    const startMemory = process.memoryUsage().heapUsed / 1024/1024;
+    const results = await Promise.all(
+      ids.map(id => supertest(web).delete(`/api/v1/student/${id}`))
+    );
+    ids = [];
+    const lastMemory = process.memoryUsage().heapUsed / 1024/1024;
+    usageMem += lastMemory - startMemory;
+
+    logger.info({ process: "delete 1000 students", startMemory, lastMemory, totalMemory: lastMemory - startMemory });
+
+    const students = await supertest(web).get("/api/v1/students").set("Accept", "application/json");
+
+    expect(results.filter(res => res.status == 200).length).toBe(1000);
+    expect(results.filter(res => res.body.success == true).length).toBe(1000);
+    expect(students.status).toBe(200);
+    expect(students.body.data.length).toBe(1);
+  });
+
+  it("cards after delete 1000 students", async function() {
+    expect.assertions(2);
+    const cards = await supertest(web).get("/api/v1/cards").set("Accept", "application/json");
+    expect(cards.status).toBe(200);
+    expect(cards.body.data.length).toBe(0);
+  });
+});

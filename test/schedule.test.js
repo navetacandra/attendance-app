@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { web, mongo }  from "../src/application";
+import { web, mongo }  from "../src/application.js";
 
 describe("Simulate /mode", function() { 
   beforeAll(async () => await mongo.initialize());
