@@ -10,6 +10,8 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/pick_student/bindings/pick_student_binding.dart';
 import '../modules/pick_student/views/pick_student_view.dart';
+import '../modules/report/bindings/report_binding.dart';
+import '../modules/report/views/report_view.dart';
 import '../modules/schedule/bindings/schedule_binding.dart';
 import '../modules/schedule/views/schedule_view.dart';
 import '../modules/students/bindings/students_binding.dart';
@@ -64,6 +66,11 @@ class AppPages {
       name: _Paths.SCHEDULE,
       page: () => ScheduleView(),
       binding: ScheduleBinding(),
+    ),
+    GetPage(
+      name: _Paths.REPORT,
+      page: () => ReportView(),
+      binding: ReportBinding(),
     ),
   ];
 }

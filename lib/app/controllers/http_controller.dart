@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
@@ -11,7 +12,8 @@ var logger = Logger(
 );
 
 class HttpController {
-  static const apiUrl = 'http://192.168.100.3:3000/api/v1';
+  // static const apiUrl = 'https://prohibited-messages-evaluating-economic.trycloudflare.com/api/v1';
+  static const apiUrl = 'http://127.0.0.1:3000/api/v1';
 
   static StreamController<List<Map<String, dynamic>>> streamList(String path) {
     StreamController<List<Map<String, dynamic>>> streamController = StreamController();
@@ -80,6 +82,16 @@ class HttpController {
 
     streamController.onCancel = () => client.close();
     return streamController;
+  }
+
+  static Future<bool> download(String path, String dest) async {
+    try {
+      final download = await Dio().download("$apiUrl$path", dest);
+      if(download.statusCode != 200) return false;
+      return true;
+    } catch(err) {
+      throw Exception(err);
+    }
   }
 
   static Future<Map<String, dynamic>> get(String path) async {

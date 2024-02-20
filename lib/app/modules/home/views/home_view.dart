@@ -59,6 +59,12 @@ class HomeView extends GetView<HomeController> {
                     Get.toNamed(Routes.SCHEDULE); 
                   },
                 ),
+                ElevatedButton(
+                  child: const Text("REPORT"),
+                  onPressed: () {
+                    Get.toNamed(Routes.REPORT); 
+                  },
+                ),
               ],
             ),
           ),
