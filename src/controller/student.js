@@ -18,6 +18,16 @@ export function studentsGet(req, res) {
   }
 }
 
+export function studentsKelasGet(req, res) {
+  const { mongo, headers } = req;
+  const students = mongo.students.filter(f => !f.removeContent);
+  if(!students.length) {
+    return res.status(404).json(new ErrorResponse(404, "No students registered", "STUDENT_NOT_REGISTERED"));
+  }
+  const kelas = Array.from(new Set(students.map(s => s.kelas)));
+  return res.status(200).json(new SuccessResponse(kelas));
+}
+
 export function studentsPost(req, res) {
   const { mongo, body } = req;
   try {

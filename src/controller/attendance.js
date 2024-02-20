@@ -5,6 +5,7 @@ import { setHeader, writeResponse } from "../utils/sse.js";
 import SuccessResponse from "../responses/success-response.js";
 import ErrorResponse from "../responses/error-response.js";
 import convertCsv2Xlsx from "../utils/xlsx.js";
+import logger from "../utils/logger.js";
 
 export function attendedList(req, res) {
   const { mongo, headers } = req;
@@ -52,12 +53,14 @@ export async function attendedReport(req, res) {
     const filename = `${result.month.toUpperCase()}_${dates[0]}-${dates[dates.length -1]}_${Date.now()}.xlsx`;
     const xlsx = await convertCsv2Xlsx(report);
 
-    res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     return res.status(200).sendFile(xlsx, () => unlinkSync(xlsx));
   } catch(err) {
+    console.log(err);
     if(err._original) {
       return res.status(400).json(new ErrorResponse(400, err.details[0].message, 'INVALID_DATA'));
     } else {
+      // logger.error(err);
       const errorDetail = mongo.errorCodes[err];
       if(!errorDetail) return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
       return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));
