@@ -38,7 +38,10 @@ export function presenceTagPost(req, res) {
       return res.status(400).json(new ErrorResponse(400, err.details[0].message, 'INVALID_DATA'));
     } else {
       const errorDetail = mongo.errorCodes[err];
-      if(!errorDetail) return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
+      if(!errorDetail) {
+        logger.error(err.toString());
+        return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
+      }
       return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));
     } 
   }
@@ -50,19 +53,20 @@ export async function attendedReport(req, res) {
     let dates = (query.dates ?? '').split(',');
     const result = validate(attendanceReportValidation, {...query, dates});
     const report = await mongo.attendedReport(result);
-    const filename = `${result.month.toUpperCase()}_${dates[0]}-${dates[dates.length -1]}_${Date.now()}.xlsx`;
+    const filename = `${query.kelas.toUpperCase()}_${result.month.toUpperCase()}_${dates[0]}-${dates[dates.length -1]}_${Date.now()}.xlsx`;
     const xlsx = await convertCsv2Xlsx(report);
 
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     return res.status(200).sendFile(xlsx, () => unlinkSync(xlsx));
   } catch(err) {
-    console.log(err);
     if(err._original) {
       return res.status(400).json(new ErrorResponse(400, err.details[0].message, 'INVALID_DATA'));
     } else {
-      // logger.error(err);
       const errorDetail = mongo.errorCodes[err];
-      if(!errorDetail) return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
+      if(!errorDetail) {
+        logger.error(err.toString());
+        return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
+      }
       return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));
     }
   }

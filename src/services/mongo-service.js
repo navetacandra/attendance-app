@@ -19,6 +19,24 @@ const months = [
   "desember"
 ];
 
+function getStat(stat = []) {
+  let tepat = 0,
+    telat = 0,
+    sakit = 0,
+    izin = 0,
+    tanpaKet = 0;
+
+  for (const s of stat) {
+    if(s == 'tepat') tepat += 1;
+    if(s == 'telat') telat += 1;
+    if(s == 'sakit') sakit += 1;
+    if(s == 'izin') izin += 1;
+    if(/alpha|-/.test(s)) tanpaKet += 1;
+  }
+
+  return {tepat, telat, sakit, izin, alpha: tanpaKet};
+}
+
 function parseToTime(time) {
   return time.match(/([01][0-9]|2[0-4])\:([0-5][0-9])/).slice(1).map(tm => Number(tm));
 }
@@ -428,13 +446,18 @@ class MongoService extends EventEmitter {
     }
   }
 
-  async attendedReport({ month, dates }) {
+  async attendedReport({ month, dates, kelas }) {
     const choosenDate = this.presenceSchedule.filter(schedule => schedule.month === month && dates.includes(schedule.date));
     if(choosenDate.length != dates.length) throw 'INVALID_DATE';
 
     const rows = [
-      ['NIS', 'NAMA', 'KELAS', 'TELEPON SISWA', 'TELEPON WALI MURID', 'TELEPON WALI KELAS', choosenDate.map(d => [d.date, '', '']).flat()].flat(2),
-      ['', '', '', '', '', '', choosenDate.map(_ => ['MASUK', 'STATUS', 'PULANG'])].flat(2)
+      [
+        'NIS', 'NAMA', 'KELAS', choosenDate.map(d => [d.date, '', '']),
+        'TOTAL TEPAT', 'TOTAL TELAT', 'TOTAL SAKIT', 'TOTAL IZIN', 'TOTAL TANPA KETERANGAN'
+      ].flat(2),
+      [
+        '', '', '', choosenDate.map(_ => ['MASUK', 'STATUS', 'PULANG'])
+      ].flat(2)
     ];
 
     let attended = quickSort(choosenDate, 0, choosenDate.length -1, '_id');
@@ -444,16 +467,22 @@ class MongoService extends EventEmitter {
         : this.db.collection('attended').findOne({ _id: cd._id }))
     );
     attended = attended.map(at => at.students);
-    let students = quickSort(this.students, 0, this.students.length -1, 'nama');
+    let students = this.students
+    students = kelas.toLowerCase() == 'all' ? students : students.filter(student => kelas.toLowerCase() == student.kelas.toLowerCase()); 
+    students = quickSort(students, 0, students.length -1, 'nama');
     students = quickSort(students, 0, students.length -1, 'kelas');
 
     for (const student of students) {
-      const cols = [student?.nis ?? '-', student?.nama ?? '-', student?.kelas ?? '-', student?.telSiswa ?? '-', student?.telWaliMurid ?? '-', student?.telWaliKelas ?? '-'];
+      const cols = [student?.nis ?? '-', student?.nama ?? '-', student?.kelas ?? '-'];
       for (const date of attended) {
         const studentData = date.find(sd => sd.studentId == student._id);
-        cols.push(...[studentData?.masuk ?? '-', studentData?.status ?? '-', studentData?.pulang ?? '-'])
+        cols.push(...[studentData?.masuk ?? '-', studentData?.pulang ?? '-', studentData?.status ?? '-'])
       }
 
+      const stat = getStat(
+        cols.slice(3).filter((_, i) => i%3 == 0)
+      );
+      cols.push(...[stat.tepat, stat.telat, stat.sakit, stat.izin, stat.alpha]);
       rows.push(cols);
     }
 
