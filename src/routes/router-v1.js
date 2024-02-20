@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import { readFileSync } from "fs";
 import { mongo, whatsapp } from "../application.js";
 import { modeGet, modeUpdate, scheduleDetailGet, scheduleDetailUpdate, scheduleGet, scheduleUpdate } from "../controller/schedule.js";
-import { cardsGet, studentDeleteById, studentGetById, studentPutById, studentsGet, studentsPost } from "../controller/student.js";
+import { cardsGet, studentDeleteById, studentGetById, studentPutById, studentsGet, studentsKelasGet, studentsPost } from "../controller/student.js";
 import { onWhatsappGet, whatsappGet, whatsappLogout, whatsappQR } from "../controller/whatsapp.js";
 import { attendedList, attendedReport, presenceTagPost } from "../controller/attendance.js";
 import { writeResponse } from "../utils/sse.js";
@@ -64,6 +64,7 @@ routerV1.get('/schedule', scheduleGet);
 routerV1.put('/schedule', scheduleUpdate);
 routerV1.get('/students', studentsGet)
 routerV1.post('/students', studentsPost);
+routerV1.get('/students/kelas', studentsKelasGet);
 routerV1.get('/student/:studentId', studentGetById);
 routerV1.put('/student/:studentId', studentPutById);
 routerV1.delete('/student/:studentId', studentDeleteById);

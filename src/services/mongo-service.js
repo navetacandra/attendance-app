@@ -143,13 +143,13 @@ class MongoService extends EventEmitter {
       ]);
     }
     if(!(await this.db.collection("presence_schedule").find().toArray()).length) {
-      let count = 0;
       const schedule = months.map((month, i) => {
-        return Array.from({ length: i == 1 ? 29 : i < 7 ? i%2 == 0 ? 31 : 30 : i%2 == 0 ? 30 : 31 }).map((date) => {
+        return Array.from({ length: i == 1 ? 29 : i < 7 ? i%2 == 0 ? 31 : 30 : i%2 == 0 ? 30 : 31 }).map((_, date) => {
+          scheduleCount += 1;
           return {
-            _id: scheduleCount++,
+            _id: scheduleCount,
             month: month,
-            date: date,
+            date: (date+1).toString(),
             isActive: true
           };
         })
