@@ -19,7 +19,7 @@ export function studentsGet(req, res) {
 }
 
 export function studentsKelasGet(req, res) {
-  const { mongo, headers } = req;
+  const { mongo } = req;
   const students = mongo.students.filter(f => !f.removeContent);
   if(!students.length) {
     return res.status(404).json(new ErrorResponse(404, "No students registered", "STUDENT_NOT_REGISTERED"));

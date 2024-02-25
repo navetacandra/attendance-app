@@ -795,6 +795,136 @@
         }
       }
     },
+    "/students/kelas": {
+      "get": {
+        "summary": "Get available kelas",
+        "tags": [
+          "student"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful get available kelas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "code": 200,
+                  "data": [
+                    "11 RPL1"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No students registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "code": 404,
+                  "error": {
+                    "code": "STUDENT_NOT_REGISTERED",
+                    "message": "No students registered"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cards": {
+      "get": {
+        "summary": "Get added cards",
+        "tags": [
+          "student"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful get added cards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Card"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "emptyCards": {
+                    "value": {
+                      "success": true,
+                      "code": 200,
+                      "data": []
+                    }
+                  },
+                  "hasCards": {
+                    "value": {
+                      "success": true,
+                      "code": 200,
+                      "data": [
+                        {
+                          "_id": "123",
+                          "tag": "-AB-CD-42-31"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Card"
+                      }
+                    }
+                  }
+                },
+                "example": "data: [{\"_id\": \"123\",\"tag\": \"-AB-CD-42-31}]"
+              }
+            }
+          }
+        }
+      }
+    },
     "/student/{studentId}": {
       "parameters": [
         {
@@ -1016,7 +1146,7 @@
           "200": {
             "description": "Successful delete student",
             "content": {
-              "appliaction/json": {
+              "application/json": {
                 "schema": {
                   "allOf": [
                     {
@@ -1272,7 +1402,7 @@
           "200": {
             "description": "Successful logout WhatsApp",
             "content": {
-              "appliaction/json": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"  
                 },
@@ -1287,7 +1417,7 @@
           "400": {
             "description": "WhatsApp not ready",
             "content": {
-              "appliaction/json": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
@@ -1305,7 +1435,7 @@
           "500": {
             "description": "Failed logout WhatsApp",
             "content": {
-              "appliaction/json": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
@@ -1558,7 +1688,7 @@
           "404": {
             "description": "Card not found",
             "content": {
-              "appliaction/json": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
@@ -1568,6 +1698,91 @@
                   "error": {
                     "message": "Card tag is not registered",
                     "code": "CARD_NOT_REGISTERED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/presence-report": {
+      "get": {
+        "summary": "Download presence report",
+        "tags": [
+          "attendance"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "dates",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"
+          },
+          {
+            "in": "query",
+            "name": "month",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "januari"
+          },
+          {
+            "in": "query",
+            "name": "kelas",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "allKelas": {
+                "value": "all"
+              },
+              "specificKelas": {
+                "value": "11 RPL1"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful download presence report"
+          },
+          "400": {
+            "description": "Failed download cause wrong parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "code": 400,
+                  "error": {
+                    "code": "INVALID_DATE",
+                    "message": "Given date invalid or not found"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed download cause internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "code": 500,
+                  "error": {
+                    "code": "SERVER_ERROR",
+                    "message": "Error on server"
                   }
                 }
               }

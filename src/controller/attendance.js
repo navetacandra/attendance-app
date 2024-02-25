@@ -50,8 +50,9 @@ export function presenceTagPost(req, res) {
 export async function attendedReport(req, res) {
   const { mongo, query } = req;
   try {
-    let dates = (query.dates ?? '').split(',');
-    const result = validate(attendanceReportValidation, {...query, dates});
+    let dates = (query.dates ?? '').toLowerCase().split(',');
+    let month = query.month.toLowerCase();
+    const result = validate(attendanceReportValidation, {...query, dates, month});
     const report = await mongo.attendedReport(result);
     const filename = `${query.kelas.toUpperCase()}_${result.month.toUpperCase()}_${dates[0]}-${dates[dates.length -1]}_${Date.now()}.xlsx`;
     const xlsx = await convertCsv2Xlsx(report);
