@@ -26,7 +26,7 @@ const streamClients = {
   "scheduleDetail": [],
   "students": [],
   "cards": [],
-  "presence": [],
+  "attended": [],
   "whatsapp": []
 };
 global.streamClients = streamClients;
