@@ -18,6 +18,7 @@ class EditStudentController extends GetxController {
   };
   var currentStudent = {};
   final RxMap formErrors = {}.obs;
+  final RxBool isLoading = false.obs;
 
   Future<bool> getStudent(BuildContext context) async {
     final response = await HttpController.get("/student/${Get.arguments["id"]}");
@@ -52,6 +53,7 @@ class EditStudentController extends GetxController {
   }
 
   void submit(BuildContext context) async {
+    isLoading.value = true;
     final dataKeys = formControllers.keys.toList();
     Map<String, dynamic> data = {};
     formErrors.value = {};
@@ -84,6 +86,7 @@ class EditStudentController extends GetxController {
 
     if(errCount > 0) {
       formErrors.value = tmpFormErrors;
+      isLoading.value = false;
       return;
     }
 
@@ -97,5 +100,6 @@ class EditStudentController extends GetxController {
         showAlert(context, "Failed Update Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
       });
     }
+    isLoading.value = false;
   }
-}
+

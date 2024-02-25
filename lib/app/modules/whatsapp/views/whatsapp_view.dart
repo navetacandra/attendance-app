@@ -84,23 +84,27 @@ class WhatsappView extends GetView<WhatsappController> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  InkWell(
-                    onTap: () async => await selfC.logout(),
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          "Log Out",
-                          style: TextStyle(
-                           color: Colors.white,
-                           fontSize: 20,
-                           fontWeight: FontWeight.w600,
-                          ),
+                  Obx(() =>
+                    InkWell(
+                      onTap: () async => await selfC.logout(),
+                      child: Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: selfC.isLoading.isFalse
+                            ? const Text(
+                              "Log Out",
+                              style: TextStyle(
+                               color: Colors.white,
+                               fontSize: 20,
+                               fontWeight: FontWeight.w600,
+                              ),
+                            )
+                            : const CircularProgressIndicator(color: Colors.white),
                         ),
                       ),
                     ),

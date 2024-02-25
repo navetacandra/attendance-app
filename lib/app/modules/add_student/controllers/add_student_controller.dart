@@ -18,6 +18,7 @@ class AddStudentController extends GetxController {
     "telWaliKelas": TextEditingController(),
   };
   final RxMap formErrors = {}.obs;
+  final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
@@ -41,6 +42,7 @@ class AddStudentController extends GetxController {
   }
 
   void submit(BuildContext context) async {
+    isLoading.value = true;
     final dataKeys = formControllers.keys.toList();
     Map<String, dynamic> data = {};
     formErrors.value = {};
@@ -74,6 +76,7 @@ class AddStudentController extends GetxController {
 
     if(errCount > 0) {
       formErrors.value = tmpFormErrors;
+      isLoading.value = false;
       return;
     }
 
@@ -87,5 +90,6 @@ class AddStudentController extends GetxController {
         showAlert(context, "Failed Add Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
       });
     }
+    isLoading.value = false;
   }
 }

@@ -25,6 +25,7 @@ class ReportController extends GetxController {
   final selectedKelas = "".obs;
   final dates = [].obs;
   final kelas = ["All"].obs;
+  final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
@@ -32,16 +33,6 @@ class ReportController extends GetxController {
     getKelas();
     super.onInit();
   }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  } 
 
   void initDates() {
     var selectedMonthIndex = months.indexOf(selectedMonth.value);
@@ -118,6 +109,7 @@ class ReportController extends GetxController {
   }
 
   void download() async {
+    isLoading.value = true;
     final selectedDates = dates.expand((date) => date).where((date) => date["selected"]).map((date) => date["date"] as int).toList();
     if(selectedDates.isEmpty) {
       return showAlert("Failed request download", "No dates selected", ArtSweetAlertType.danger, () {});
@@ -140,6 +132,8 @@ class ReportController extends GetxController {
       return showAlert("Success request download", "File downloaded\n$filepath", ArtSweetAlertType.success, () {});
     } catch(err) {
       return showAlert("Failed request download", err.toString(), ArtSweetAlertType.danger, () {});
+    } finally {
+      isLoading.value = false;
     }
   }
 }

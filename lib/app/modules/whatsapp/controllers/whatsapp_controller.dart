@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 
 class WhatsappController extends GetxController {
   final whatsappStream = HttpController.streamMap("/whatsapp"); 
+  final RxBool isLoading = false.obs;
 
   Future<bool> logout() async {
+    isLoading.value = true;
     try {
       final response = await HttpController.get("/whatsapp/logout");
       
@@ -18,6 +20,8 @@ class WhatsappController extends GetxController {
     } catch(err) {
       Get.snackbar("Error", err.toString());
       return false;
+    } finally {
+      isLoading.value = false;
     }
   }
 }

@@ -329,23 +329,30 @@ class EditStudentView extends GetView<EditStudentController> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    InkWell(
-                      onTap: () => selfC.submit(context),
-                      child: Container(
-                        width: double.infinity,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            "EDIT STUDENT",
-                            style: TextStyle(fontSize: 20, color: Colors.white),
+                    Obx(() => 
+                      InkWell(
+                        onTap: () => selfC.isLoading.isFalse
+                          ? selfC.submit(context)
+                          : null,
+                        child: Container(
+                          width: double.infinity,
+                          height: 50,
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Center(
+                            child: selfC.isLoading.isFalse 
+                              ? const Text(
+                                "EDIT STUDENT",
+                                style: TextStyle(fontSize: 20, color: Colors.white),
+                              )
+                              : const CircularProgressIndicator(color: Colors.white),
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               );

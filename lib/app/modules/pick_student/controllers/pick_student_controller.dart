@@ -20,6 +20,7 @@ class PickStudentController extends GetxController {
   final RxMap formErrors = {}.obs;
   final students = <Map<String, dynamic>>[].obs;
   final selectedStudent = <String, dynamic>{}.obs;
+  final RxBool isLoading = false.obs;
 
   @override
   void onInit() async {
@@ -90,6 +91,7 @@ class PickStudentController extends GetxController {
   }
 
   void submit(BuildContext context) async {
+    isLoading.value = true;
     final dataKeys = formControllers.keys.toList();
     Map<String, dynamic> data = {};
     formErrors.value = {};
@@ -110,5 +112,6 @@ class PickStudentController extends GetxController {
         showAlert(context, "Failed Update Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
       });
     }
+    isLoading.value = false;
   }
 }

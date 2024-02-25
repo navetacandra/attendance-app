@@ -112,30 +112,36 @@ class ReportView extends GetView<ReportController> {
                 ),
               ),
               const SizedBox(height: 30),
-              InkWell(
-                onTap: () => selfC.download(),
-                child: Container(
-                  width: double.infinity,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Download",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+              Obx(() => 
+                InkWell(
+                  onTap: () => selfC.isLoading.isFalse
+                    ? selfC.download()
+                    : null,
+                  child: Container(
+                    width: double.infinity,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: <BoxShadow>[
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: selfC.isLoading.isFalse
+                        ? const Text(
+                          "Download",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                        : const CircularProgressIndicator(color: Colors.white),
                     ),
                   ),
                 ),
