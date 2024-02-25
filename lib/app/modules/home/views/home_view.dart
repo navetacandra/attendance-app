@@ -197,27 +197,27 @@ class HomeView extends GetView<HomeController> {
                     runSpacing: 20,
                     children: <Widget>[
                       menuItem(
-                        label: "Tambah Siswa",
-                        iconPath: "assets/user-add.png",
+                        label: "Students",
+                        iconPath: "assets/users.png",
                         navigation: Routes.STUDENTS,
                       ),
                       menuItem(
-                        label: "Tambah Kartu", 
+                        label: "Cards", 
                         iconPath: "assets/card.png", 
                         navigation: Routes.CARDS,
                       ),
                       menuItem(
-                        label: "Download Laporan", 
+                        label: "Download Report", 
                         iconPath: "assets/note.png", 
                         navigation: Routes.REPORT,
                       ),
                       menuItem(
-                        label: "Jadwal Absensi",
+                        label: "Schedule Management",
                         iconPath: "assets/calendar-clock.png", 
                         navigation: Routes.SCHEDULE,
                       ),
                       menuItem(
-                        label: "Koneksi WhatsApp",
+                        label: "WhatsApp",
                         iconPath: "assets/phone.png",
                         navigation: Routes.WHATSAPP,
                       ),
