@@ -2,5 +2,5 @@ node_modules/
 *-state/
 *-config.json
 *service-account.json
-*.log
+*.log*
 queue.json

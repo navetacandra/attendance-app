@@ -9,7 +9,9 @@ const loggerFormat = format.combine(
       .includes(typeof info.message) 
         ? JSON.stringify(info.message, null, 2) 
         : info.message
-    return `[${info.timestamp}] [${info.level.toUpperCase()}] : ${parsedMessage}`;
+    return `[${
+      new Date(info.timestamp).toLocaleString("id", { timeZone: "Asia/Jakarta" })
+    }] [${info.level.toUpperCase()}] : ${parsedMessage}`;
   })
 );
 
@@ -19,6 +21,8 @@ const logger = createLogger({
     new transports.Console({ format: loggerFormat }),
     new transports.File({
       format: loggerFormat,
+      zippedArchive: true,
+      maxsize: 1024 * 1024 * 50,
       filename: resolve(join(
         dirname(fileURLToPath(import.meta.url)), '../..', 'app.log'
       ))
