@@ -10,7 +10,7 @@ const attendanceValidation = Joi.object({
 const attendanceReportValidation = Joi.object({
   month: Joi.string().pattern(/^(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)$/).required(),
   dates: Joi.array().items(Joi.string().pattern(/^(?:0?[1-9]|[12][0-9]|3[01])$/)).min(1).required(),
-  kelas: Joi.string().required().pattern(/^(all|\d{2} \w{2,4}\d{1,2})$/i),
+  kelas: Joi.string().required().pattern(/^(all|\d{2} \w{2,4} ?\d{1,2})$/i),
 }).options({ stripUnknown: true });
 
 export { attendanceValidation, attendanceReportValidation };

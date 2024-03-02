@@ -10,6 +10,8 @@ import { cardsGet, studentDeleteById, studentGetById, studentPutById, studentsGe
 import { onWhatsappGet, whatsappGet, whatsappLogout, whatsappQR } from "../controller/whatsapp.js";
 import { attendedList, attendedReport, presenceTagPost } from "../controller/attendance.js";
 import { writeResponse } from "../utils/sse.js";
+import { isAdmin, isAuthenticated } from "../middleware/auth.js";
+import { deleteUser, signIn, signOut, signUp, userInfo } from "../controller/authentication.js";
 
 const routerV1 = new Router();
 
@@ -56,25 +58,30 @@ function sentEvents() {
 }
 
 routerV1.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
-routerV1.get('/mode', modeGet);
-routerV1.put('/mode', modeUpdate);
-routerV1.get('/schedule-detail', scheduleDetailGet);
-routerV1.put('/schedule-detail', scheduleDetailUpdate);
-routerV1.get('/schedule', scheduleGet);
-routerV1.put('/schedule', scheduleUpdate);
-routerV1.get('/students', studentsGet)
-routerV1.post('/students', studentsPost);
-routerV1.get('/students/kelas', studentsKelasGet);
-routerV1.get('/student/:studentId', studentGetById);
-routerV1.put('/student/:studentId', studentPutById);
-routerV1.delete('/student/:studentId', studentDeleteById);
-routerV1.get('/cards', cardsGet);
-routerV1.get('/whatsapp', whatsappGet);
-routerV1.get('/whatsapp/qrcode', whatsappQR);
-routerV1.get('/whatsapp/logout', whatsappLogout);
-routerV1.get('/on-whatsapp/:number', onWhatsappGet);
-routerV1.get('/presence', attendedList);
-routerV1.post('/presence', presenceTagPost);
-routerV1.get('/presence-report', attendedReport);
+routerV1.post('/user/signup', isAuthenticated, isAdmin, signUp);
+routerV1.post('/user/signin', signIn);
+routerV1.delete('/user/signout', isAuthenticated, signOut);
+routerV1.get('/user/info', isAuthenticated, userInfo);
+routerV1.delete('/user/delete', isAuthenticated, isAdmin, deleteUser);
+routerV1.get('/mode', isAuthenticated, modeGet);
+routerV1.put('/mode', isAuthenticated, modeUpdate);
+routerV1.get('/schedule-detail', isAuthenticated, scheduleDetailGet);
+routerV1.put('/schedule-detail', isAuthenticated, scheduleDetailUpdate);
+routerV1.get('/schedule', isAuthenticated, scheduleGet);
+routerV1.put('/schedule', isAuthenticated, scheduleUpdate);
+routerV1.get('/students', isAuthenticated, studentsGet)
+routerV1.post('/students', isAuthenticated, studentsPost);
+routerV1.get('/students/kelas', isAuthenticated, studentsKelasGet);
+routerV1.get('/student/:studentId', isAuthenticated, studentGetById);
+routerV1.put('/student/:studentId', isAuthenticated, studentPutById);
+routerV1.delete('/student/:studentId', isAuthenticated, studentDeleteById);
+routerV1.get('/cards', isAuthenticated, cardsGet);
+routerV1.get('/whatsapp', isAuthenticated, whatsappGet);
+routerV1.get('/whatsapp/qrcode', isAuthenticated, whatsappQR);
+routerV1.get('/whatsapp/logout', isAuthenticated, whatsappLogout);
+routerV1.get('/on-whatsapp/:number', isAuthenticated, onWhatsappGet);
+routerV1.get('/presence', isAuthenticated, attendedList);
+routerV1.post('/presence', isAuthenticated, presenceTagPost);
+routerV1.get('/presence-report', isAuthenticated, attendedReport);
 
 export { routerV1 as default, sentEvents, streamClients };

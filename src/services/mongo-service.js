@@ -60,7 +60,10 @@ class MongoService extends EventEmitter {
     this.presenceDetail = [];
     this.presenceSchedule = [];
     this.attended = {};
+    this.users = [];
+    this.tokens = [];
     this.students = [];
+    this.teachers = [];
     this.cards = [];
     this.errorCodes = {
       NIS_ALREADY_REGISTERED: {
@@ -125,8 +128,11 @@ class MongoService extends EventEmitter {
       await this.createCollections();
       this.presenceDetail = await this.db.collection('presence_detail').find().toArray();
       this.presenceSchedule = await this.db.collection('presence_schedule').find().toArray();
-      this.students = await this.db.collection('students').find().toArray();
-      this.cards = await this.db.collection('cards').find().toArray();
+      this.users = await this.getInitialCollectionData('users'); 
+      this.tokens = await this.getInitialCollectionData('tokens'); 
+      this.students = await this.getInitialCollectionData('students'); 
+      this.teachers = await this.getInitialCollectionData('teachers');
+      this.cards = await this.getInitialCollectionData('cards');
       await this.syncPresencesWithSchedule();
     } catch(err) {
       logger.error(`Failed connect to MongoDB. caused: ${err}`);
@@ -140,17 +146,20 @@ class MongoService extends EventEmitter {
     clearInterval(this.storeState);
   }
 
+  async getInitialCollectionData(collectionName) {
+    if(!this.db) return;
+    let initialData = await this.db.collection(collectionName).find().toArray();
+    if(!initialData.length) {
+      await this.db.createCollection(collectionName);
+      return [];
+    }
+    return initialData;
+  }
+
   async createCollections() {
     if(!this.db) return;
     let scheduleCount = 0;
 
-    if(!(await this.db.collection("students").find().toArray()).length) {
-      await this.db.createCollection("students");
-    }
-    if(!(await this.db.collection("cards").find().toArray()).length) {
-      await this.db.createCollection("cards");
-    }
-    
     if(!(await this.db.collection("presence_detail").find().toArray()).length) {
       await this.db.collection("presence_detail").insertMany([
         {_id: 1, mode: "presence"},
@@ -243,7 +252,10 @@ class MongoService extends EventEmitter {
     await Promise.all([
       this.storeStateToDatabase('presenceDetail', 'presence_detail'),
       this.storeStateToDatabase('presenceSchedule', 'presence_schedule'),
+      this.storeStateToDatabase('users', 'users'),
+      this.storeStateToDatabase('tokens', 'tokens'),
       this.storeStateToDatabase('students', 'students'),
+      this.storeStateToDatabase('teachers', 'teachers'),
       this.storeStateToDatabase('cards', 'cards'),
       this.storePresencesToDatabase()
     ]);

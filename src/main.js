@@ -1,7 +1,9 @@
 import logger from "./utils/logger.js";
 import { queue, mongo, web, whatsapp } from "./application.js";
 import { sentEvents } from "./routes/router-v1.js";
+import { config } from "dotenv";
 
+config();
 const days = 'Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu'.split(',');
 const months = 'Januari,Februari,Maret,April,Mei,Juni,Juli,Agustus,September,Oktober,November,Desember'.split(',');
 
