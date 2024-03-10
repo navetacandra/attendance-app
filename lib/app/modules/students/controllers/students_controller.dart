@@ -11,6 +11,21 @@ class StudentsController extends GetxController {
   final RxMap selectedStudent = {}.obs;
 
   @override
+  void onInit() {
+    studentStream.stream.listen((studentz) {
+      students.value = studentz;
+      for (int i = 0; i < studentz.length; i++) {
+        final std = studentz[i];
+        if(std["nama"].runtimeType != String) {
+          logger.d("Error in index: $i");
+          logger.d(std);
+        }
+      }
+    });
+    super.onInit();
+  }
+
+  @override
   void onClose() {
     studentStream.close();
     super.onClose();

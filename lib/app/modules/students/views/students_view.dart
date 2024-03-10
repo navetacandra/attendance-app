@@ -1,3 +1,4 @@
+import 'package:attendance_app/app/controllers/http_controller.dart';
 import 'package:attendance_app/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -52,39 +53,62 @@ class StudentsView extends GetView<StudentsController> {
                 horizontal: 20,
                 vertical: 30,
               ),
-              child: StreamBuilder(
-                  stream: selfC.studentStream.stream,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.active) {
-                      final students = snapshot.data
-                          ?.where((student) => student['removeContent'] != true)
-                          .toList();
-                      selfC.students.value = students ?? [];
-                      if (students!.isNotEmpty) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: students
-                              .map((student) => studentCard(
-                                    id: student["_id"],
-                                    nama: student["nama"],
-                                    kelas: student["kelas"],
-                                    nis: student["nis"],
-                                    email: student["email"],
-                                  ))
-                              .toList(),
-                        );
-                      } else {
-                        return const Center(
-                          child: Text(
-                            "No Students",
-                            style: TextStyle(fontSize: 25),
-                          ),
-                        );
-                      }
-                    } else {
-                      return Container();
-                    }
-                  }),
+              child: Obx(() =>
+                selfC.students.isEmpty
+                ? const Center(
+                  child: Text(
+                    "No Students",
+                    style: TextStyle(fontSize: 25),
+                  ),
+                )
+                : Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    for(final student in selfC.students) ...[
+                      studentCard(
+                        id: student["_id"], 
+                        nama: student["nama"], 
+                        kelas: student["kelas"],
+                        nis: student["nis"], 
+                        email: student["email"],
+                      ),
+                    ]
+                  ],
+                ),
+              ),
+              // StreamBuilder(
+              //     stream: selfC.studentStream.stream,
+              //     builder: (context, snapshot) {
+              //       if (snapshot.connectionState == ConnectionState.active) {
+              //         final students = snapshot.data;
+              //         selfC.students.value = students ?? [];
+              //         if (students!.isNotEmpty) {
+              //           return Column(
+              //             mainAxisAlignment: MainAxisAlignment.start,
+              //             children: [
+              //               for(final student in students) ...[
+              //                 studentCard(
+              //                   id: student["_id"], 
+              //                   nama: student["nama"], 
+              //                   kelas: student["kelas"],
+              //                   nis: student["nis"], 
+              //                   email: student["email"],
+              //                 ),
+              //               ]
+              //             ],
+              //           );
+              //         } else {
+              //           return const Center(
+              //             child: Text(
+              //               "No Students",
+              //               style: TextStyle(fontSize: 25),
+              //             ),
+              //           );
+              //         }
+              //       } else {
+              //         return Container();
+              //       }
+              //     }),
             ),
           ),
           floatingActionButton: FloatingActionButton(

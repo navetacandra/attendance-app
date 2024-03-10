@@ -12,6 +12,8 @@ abstract class Routes {
   static const WHATSAPP = _Paths.WHATSAPP;
   static const SCHEDULE = _Paths.SCHEDULE;
   static const REPORT = _Paths.REPORT;
+  static const STUDENT_TABLE = _Paths.STUDENT_TABLE;
+  static const AUTH = _Paths.AUTH;
 }
 
 abstract class _Paths {
@@ -25,4 +27,6 @@ abstract class _Paths {
   static const WHATSAPP = '/whatsapp';
   static const SCHEDULE = '/schedule';
   static const REPORT = '/report';
+  static const STUDENT_TABLE = '/student-table';
+  static const AUTH = '/auth';
 }

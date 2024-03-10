@@ -10,20 +10,19 @@ dependencies:
   get: 4.6.6
   flutter: 
     sdk: flutter
-  firebase_core: ^2.25.4
-  http: ^1.2.0
-  dio: ^5.4.0
-  firebase_auth: ^4.17.4
+  http: ^1.2.1
+  dio: ^5.4.1
   google_fonts: ^6.1.0
   email_validator: ^2.1.17
   network_info_plus: ^4.1.0+1
   permission_handler: ^11.2.1
-  ez_validator: ^0.3.3
+  ez_validator: ^0.3.5
   art_sweetalert: ^0.0.5
   sliding_up_panel: ^2.0.0+1
   logger: ^2.0.2+1
   path_provider: ^2.1.2
   universal_html: ^2.2.4
+  get_storage: ^2.1.1
 
 dev_dependencies: 
   flutter_lints: ^3.0.1

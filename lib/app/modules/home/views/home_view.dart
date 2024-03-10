@@ -1,11 +1,15 @@
+import 'package:attendance_app/app/controllers/http_controller.dart';
 import 'package:attendance_app/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   HomeView({super.key});
   final selfC = Get.find<HomeController>();
+  final storage = GetStorage();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +54,22 @@ class HomeView extends GetView<HomeController> {
                   padding: const EdgeInsets.all(8),
                   width: double.infinity,
                   height: Get.height * .20,
-                  // color: Colors.red,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text("hell"),
+                      Spacer(),
+                      InkWell(
+                        onTap: () => selfC.signOut(),
+                        child: const Icon(
+                          Icons.logout,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(5),
@@ -90,15 +109,20 @@ class HomeView extends GetView<HomeController> {
                               ),
                             ),
                             const SizedBox(height: 18),
-                            Obx(() =>
-                              Text(
-                                "${selfC.siswa.value}",
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 24,
+                            InkWell(
+                              onTap: () => storage.read('user')['role'] == 'admin' 
+                                ? Get.toNamed(Routes.STUDENT_TABLE) 
+                                : null,
+                              child: Obx(() =>
+                                Text(
+                                  "${selfC.siswa.value}",
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                  ),
                                 ),
                               ),
                             ),
@@ -157,7 +181,7 @@ class HomeView extends GetView<HomeController> {
                                     child: Container(
                                       margin: const EdgeInsets.only(top: 19),
                                       child: Text(
-                                        "${selfC.percentage.value * 100}%",
+                                        "${(selfC.percentage.value * 100).toStringAsFixed(2)}%",
                                         overflow: TextOverflow.clip,
                                         style: const TextStyle(
                                           color: Colors.black,

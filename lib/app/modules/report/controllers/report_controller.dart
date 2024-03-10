@@ -112,18 +112,21 @@ class ReportController extends GetxController {
     isLoading.value = true;
     final selectedDates = dates.expand((date) => date).where((date) => date["selected"]).map((date) => date["date"] as int).toList();
     if(selectedDates.isEmpty) {
-      return showAlert("Failed request download", "No dates selected", ArtSweetAlertType.danger, () {});
+      showAlert("Failed request download", "No dates selected", ArtSweetAlertType.danger, () {});
+      isLoading.value = false;
+      return;
     }
+
+    final filename = "${
+      selectedKelas.toUpperCase().replaceAll(RegExp(r' '), '')
+    }_${selectedMonth.value.toUpperCase()}_${selectedDates.first}-${selectedDates.last}_${
+      DateTime.now().millisecondsSinceEpoch
+    }.xlsx";
+    final path = "/presence-report?month=${selectedMonth.value}&dates=${selectedDates.join(",")}&kelas=${
+      Uri.encodeComponent(selectedKelas.isEmpty ? kelas.first : selectedKelas.value)
+    }";
     
     try {
-      final filename = "${
-        selectedKelas.toUpperCase().replaceAll(RegExp(r' '), '')
-      }_${selectedMonth.value.toUpperCase()}_${selectedDates.first}-${selectedDates.last}_${
-        DateTime.now().millisecondsSinceEpoch
-      }.xlsx";
-      final path = "/presence-report?month=${selectedMonth.value}&dates=${selectedDates.join(",")}&kelas=${
-        Uri.encodeComponent(selectedKelas.isEmpty ? kelas.first : selectedKelas.value)
-      }";
       if(kIsWeb) return downloadInWeb(path, filename);
       final filepath = "${await downloadPath()}${io.Platform.pathSeparator}$filename";
 
@@ -131,6 +134,7 @@ class ReportController extends GetxController {
       if(!download) return showAlert("Failed request download", "", ArtSweetAlertType.danger, () {});
       return showAlert("Success request download", "File downloaded\n$filepath", ArtSweetAlertType.success, () {});
     } catch(err) {
+      logger.e("Error download request $path");
       return showAlert("Failed request download", err.toString(), ArtSweetAlertType.danger, () {});
     } finally {
       isLoading.value = false;
