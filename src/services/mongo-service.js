@@ -131,6 +131,7 @@ class MongoService extends EventEmitter {
       this.users = await this.getInitialCollectionData('users'); 
       this.tokens = await this.getInitialCollectionData('tokens'); 
       this.students = await this.getInitialCollectionData('students'); 
+      this.students = quickSort(this.students, 0, this.students.length -1, 'nis');
       this.teachers = await this.getInitialCollectionData('teachers');
       this.cards = await this.getInitialCollectionData('cards');
       await this.syncPresencesWithSchedule();
@@ -330,7 +331,8 @@ class MongoService extends EventEmitter {
       isNewData: true
     });
     if(card) this.removeCard({ tag: card });
-    this.emit('students', this.students.filter(student => !student.removeContent));
+    const students = this.students.filter(student => !student.removeContent);
+    this.emit('students', quickSort(students, 0, students.length - 1, 'nis'));
     return { id: studentId, nis, nama };
   }
 
@@ -347,7 +349,8 @@ class MongoService extends EventEmitter {
       }
     }
     if(card) this.removeCard({ tag: card });
-    this.emit('students', this.students.filter(student => !student.removeContent));
+    const students = this.students.filter(student => !student.removeContent);
+    this.emit('students', quickSort(students, 0, students.length - 1, 'nis'));
     return { id, nis, nama };
   }
 
@@ -358,7 +361,8 @@ class MongoService extends EventEmitter {
     const { _id, nis, nama } = this.students[studentIndex];
     this.students[studentIndex] = {_id, removeContent: true};
     this.queue.addItem({ _class: 'mongo', method: 'removeAttended', args: [{id: _id}], stateToStart: 'db', maxRetries: 2 });
-    this.emit('students', this.students.filter(student => !student.removeContent));
+    const students = this.students.filter(student => !student.removeContent);
+    this.emit('students', quickSort(students, 0, students.length - 1, 'nis'));
     return { id: _id, nis, nama };
   }
 

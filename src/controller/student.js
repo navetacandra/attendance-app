@@ -3,14 +3,16 @@ import { studentIdValidation, studentValidation } from "../validation/student.js
 import ErrorResponse from "../responses/error-response.js";
 import SuccessResponse from "../responses/success-response.js";
 import { setHeader, writeResponse } from "../utils/sse.js";
+import { quickSort } from "../utils/sort.js";
 
 export function studentsGet(req, res) {
   const { mongo, headers } = req;
   if(headers.accept === 'text/event-stream') {
     const id = Date.now();
+    const students = mongo.students.filter(f => !f.removeContent);
     global.streamClients.students.push({ id, client: res });
     setHeader(req, res, () => global.streamClients.students.splice(global.streamClients.students.findIndex(f => f.id === id), 1));
-    writeResponse(res, mongo.students.filter(f => !f.removeContent));
+    writeResponse(res, quickSort(students, 0, students.length - 1, 'nis'));
   } else if(headers.accept === 'application/json') {
     return res.status(200).json(new SuccessResponse(mongo.students.filter(f => !f.removeContent)));
   } else {

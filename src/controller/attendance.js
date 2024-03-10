@@ -39,7 +39,7 @@ export function presenceTagPost(req, res) {
     } else {
       const errorDetail = mongo.errorCodes[err];
       if(!errorDetail) {
-        logger.error(err.toString());
+        logger.error(err);
         return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
       }
       return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));

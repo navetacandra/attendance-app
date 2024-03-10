@@ -50,7 +50,7 @@ function sentEvents() {
     streamClients.cards.forEach(({ client }) => writeResponse(client, cards));
   });
   mongo.on("presence-update", presence => {
-    streamClients.presence.forEach(({ client }) => writeResponse(client, presence));
+    streamClients.attended.forEach(({ client }) => writeResponse(client, presence));
   });
   whatsapp.on("state", whatsapp => {
     streamClients.whatsapp.forEach(({ client }) => writeResponse(client, whatsapp))
@@ -81,7 +81,7 @@ routerV1.get('/whatsapp/qrcode', isAuthenticated, whatsappQR);
 routerV1.get('/whatsapp/logout', isAuthenticated, whatsappLogout);
 routerV1.get('/on-whatsapp/:number', isAuthenticated, onWhatsappGet);
 routerV1.get('/presence', isAuthenticated, attendedList);
-routerV1.post('/presence', isAuthenticated, presenceTagPost);
+routerV1.post('/presence',  presenceTagPost);
 routerV1.get('/presence-report', isAuthenticated, attendedReport);
 
 export { routerV1 as default, sentEvents, streamClients };
