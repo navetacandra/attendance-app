@@ -160,38 +160,41 @@ class HomeView extends GetView<HomeController> {
                               ),
                             ),
                             const SizedBox(height: 18),
-                            Obx(() =>
-                              Stack(
-                                children: <Widget>[
-                                  Align(
-                                    alignment: const Alignment(0, 0),
-                                    child: SizedBox(
-                                      width: 60,
-                                      height: 60,
-                                      child: CircularProgressIndicator(
-                                        value: selfC.percentage.value,
-                                        color: Colors.blue,
-                                        backgroundColor: Colors.grey,
-                                        strokeWidth: 5,
+                            InkWell(
+                              onTap: () => Get.toNamed(Routes.ATTENDED_TABLE),
+                              child: Obx(() =>
+                                Stack(
+                                  children: <Widget>[
+                                    Align(
+                                      alignment: const Alignment(0, 0),
+                                      child: SizedBox(
+                                        width: 60,
+                                        height: 60,
+                                        child: CircularProgressIndicator(
+                                          value: selfC.percentage.value,
+                                          color: Colors.blue,
+                                          backgroundColor: Colors.grey,
+                                          strokeWidth: 5,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Align(
-                                    alignment: const Alignment(0, 0),
-                                    child: Container(
-                                      margin: const EdgeInsets.only(top: 19),
-                                      child: Text(
-                                        "${(selfC.percentage.value * 100).toStringAsFixed(2)}%",
-                                        overflow: TextOverflow.clip,
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                        )
+                                    Align(
+                                      alignment: const Alignment(0, 0),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(top: 19),
+                                        child: Text(
+                                          "${(selfC.percentage.value * 100).toStringAsFixed(2)}%",
+                                          overflow: TextOverflow.clip,
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          )
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ]

@@ -15,7 +15,6 @@ var logger = Logger(
 class HttpController {
   // static const apiUrl = 'https://attendance-api.navetacandraa.my.id/api/v1';
   static const apiUrl = 'http://127.0.0.1:3000/api/v1';
-  // static const apiUrl = 'http://192.168.100.4:3000/api/v1';
 
   static StreamController<List<Map<String, dynamic>>> streamList(String path) {
     final storage = GetStorage();

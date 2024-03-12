@@ -16,7 +16,7 @@ class HomeController extends GetxController {
       siswa.value = siswaList.length;
     });
     streamAttended.stream.listen((attendedList) {
-      percentage.value = attendedList.length / siswa.value;
+      percentage.value = attendedList.where((e) => ["tepat", "telat"].contains(e["status"])).length / siswa.value;
       if(percentage.isNaN || percentage.isInfinite) {
         percentage.value = 0;
       }

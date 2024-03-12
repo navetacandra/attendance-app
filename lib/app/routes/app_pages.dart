@@ -1,9 +1,11 @@
-import 'package:attendance_app/app/middelwares/auth_guard.dart';
-import 'package:attendance_app/app/middelwares/non_auth_guard.dart';
 import 'package:get/get.dart';
 
+import '../middelwares/auth_guard.dart';
+import '../middelwares/non_auth_guard.dart';
 import '../modules/add_student/bindings/add_student_binding.dart';
 import '../modules/add_student/views/add_student_view.dart';
+import '../modules/attended_table/bindings/attended_table_binding.dart';
+import '../modules/attended_table/views/attended_table_view.dart';
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/cards/bindings/cards_binding.dart';
@@ -98,6 +100,11 @@ class AppPages {
       page: () => AuthView(),
       binding: AuthBinding(),
       middlewares: [NonAuthGuard()],
+    ),
+    GetPage(
+      name: _Paths.ATTENDED_TABLE,
+      page: () => AttendedTableView(),
+      binding: AttendedTableBinding(),
     ),
   ];
 }
