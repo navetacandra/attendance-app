@@ -29,9 +29,9 @@ class AddStudentController extends GetxController {
     }
   }
 
-  void showAlert(BuildContext context, String title, String text, ArtSweetAlertType type, Function onDispose) {
+  void showAlert(String title, String text, ArtSweetAlertType type, Function onDispose) {
     ArtSweetAlert.show(
-      context: context,
+      context: Get.context!,
       artDialogArgs: ArtDialogArgs(
         type: type,
         title: title,
@@ -41,7 +41,7 @@ class AddStudentController extends GetxController {
     );
   }
 
-  void submit(BuildContext context) async {
+  void submit() async {
     isLoading.value = true;
     final dataKeys = formControllers.keys.toList();
     Map<String, dynamic> data = {};
@@ -83,11 +83,11 @@ class AddStudentController extends GetxController {
     final result = await HttpController.post("/students", dataStudent.toJSON());
     if (result["code"] == 200) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(context, "Student Added", "", ArtSweetAlertType.success, () => Get.back());
+        showAlert("Student Added", "", ArtSweetAlertType.success, () => Get.back());
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(context, "Failed Add Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
+        showAlert("Failed Add Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
       });
     }
     isLoading.value = false;

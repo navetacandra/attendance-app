@@ -372,7 +372,7 @@ class AddStudentView extends GetView<AddStudentController> {
                 Obx(() =>
                   InkWell(
                     onTap: () => selfC.isLoading.isFalse
-                      ? selfC.submit(context)
+                      ? selfC.submit()
                       : null,
                     child: Container(
                       width: double.infinity,

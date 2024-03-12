@@ -20,11 +20,11 @@ class EditStudentController extends GetxController {
   final RxMap formErrors = {}.obs;
   final RxBool isLoading = false.obs;
 
-  Future<bool> getStudent(BuildContext context) async {
+  Future<bool> getStudent() async {
     final response = await HttpController.get("/student/${Get.arguments["id"]}");
     if (response["code"] != 200) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(context, "Failed Get Student", response["error"]["message"], ArtSweetAlertType.danger, () => Get.back());
+        showAlert("Failed Get Student", response["error"]["message"], ArtSweetAlertType.danger, () => Get.back());
       });
       return false;
     } else {
@@ -40,9 +40,9 @@ class EditStudentController extends GetxController {
     }
   }
 
-  void showAlert(BuildContext context, String title, String text, ArtSweetAlertType type, Function onDispose) {
+  void showAlert(String title, String text, ArtSweetAlertType type, Function onDispose) {
     ArtSweetAlert.show(
-      context: context,
+      context: Get.context!,
       artDialogArgs: ArtDialogArgs(
         type: type,
         title: title,
@@ -52,7 +52,7 @@ class EditStudentController extends GetxController {
     );
   }
 
-  void submit(BuildContext context) async {
+  void submit() async {
     isLoading.value = true;
     final dataKeys = formControllers.keys.toList();
     Map<String, dynamic> data = {};
@@ -93,11 +93,11 @@ class EditStudentController extends GetxController {
     final result = await HttpController.put("/student/${Get.arguments["id"]}", dataStudent.toJSON());
     if (result["code"] == 200) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(context, "Student Updated", "", ArtSweetAlertType.success, () => Get.back());
+        showAlert("Student Updated", "", ArtSweetAlertType.success, () => Get.back());
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(context, "Failed Update Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
+        showAlert("Failed Update Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
       });
     }
     isLoading.value = false;

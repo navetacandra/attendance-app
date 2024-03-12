@@ -31,22 +31,22 @@ class PickStudentController extends GetxController {
     }
 
     try {
-      students.value = await getStudents(Get.context as BuildContext);
+      students.value = await getStudents();
     } catch (err) {
-      showAlert(Get.context as BuildContext, "Failed get students", "", ArtSweetAlertType.danger, () => Get.back());
+      showAlert("Failed get students", "", ArtSweetAlertType.danger, () => Get.back());
     }
   }
 
-  Future<List<Map<String, dynamic>>> getStudents(BuildContext context) async {
+  Future<List<Map<String, dynamic>>> getStudents() async {
     final response = await HttpController.get("/students");
   
     if (response["code"] != 200) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(context, "Failed Get Student", response["error"]["message"], ArtSweetAlertType.danger, () => Get.back());
+        showAlert("Failed Get Student", response["error"]["message"], ArtSweetAlertType.danger, () => Get.back());
       });
     } else if ((response["data"] as List).where((student) => student["card"] == null).isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(context, "Failed Get Student", "No students with no card found", ArtSweetAlertType.danger, () => Get.back());
+        showAlert("Failed Get Student", "No students with no card found", ArtSweetAlertType.danger, () => Get.back());
       });
     }
     return (response["data"] as List).map((item) => item as Map<String, dynamic>).toList();
@@ -78,9 +78,9 @@ class PickStudentController extends GetxController {
     formControllers["telWaliMurid"]!.text = student["telWaliMurid"];
   }
 
-  void showAlert(BuildContext context, String title, String text, ArtSweetAlertType type, Function onDispose) {
+  void showAlert(String title, String text, ArtSweetAlertType type, Function onDispose) {
     ArtSweetAlert.show(
-      context: context,
+      context: Get.context!,
       artDialogArgs: ArtDialogArgs(
         type: type,
         title: title,
@@ -90,7 +90,7 @@ class PickStudentController extends GetxController {
     );
   }
 
-  void submit(BuildContext context) async {
+  void submit() async {
     isLoading.value = true;
     final dataKeys = formControllers.keys.toList();
     Map<String, dynamic> data = {};
@@ -105,11 +105,11 @@ class PickStudentController extends GetxController {
 
     if (result["code"] == 200) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(context, "Student Updated", "", ArtSweetAlertType.success, () => Get.back());
+        showAlert("Student Updated", "", ArtSweetAlertType.success, () => Get.back());
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAlert(context, "Failed Update Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
+        showAlert("Failed Update Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
       });
     }
     isLoading.value = false;

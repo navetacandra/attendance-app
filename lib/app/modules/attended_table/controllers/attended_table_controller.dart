@@ -1,6 +1,5 @@
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:attendance_app/app/controllers/http_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -25,7 +24,7 @@ class AttendedTableController extends GetxController {
 
   void showAlert(String title, String text, ArtSweetAlertType type, Function onDispose) {
     ArtSweetAlert.show(
-      context: Get.context as BuildContext,
+      context: Get.context!,
       artDialogArgs: ArtDialogArgs(
         type: type,
         title: title,

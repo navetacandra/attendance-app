@@ -15,7 +15,7 @@ class EditStudentView extends GetView<EditStudentController> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
           child: FutureBuilder(
-            future: selfC.getStudent(context),
+            future: selfC.getStudent(),
             builder: (context, snapshot) {
               if(snapshot.connectionState != ConnectionState.done) return Container();
               if(snapshot.data != true) return Container();
@@ -332,7 +332,7 @@ class EditStudentView extends GetView<EditStudentController> {
                     Obx(() => 
                       InkWell(
                         onTap: () => selfC.isLoading.isFalse
-                          ? selfC.submit(context)
+                          ? selfC.submit()
                           : null,
                         child: Container(
                           width: double.infinity,

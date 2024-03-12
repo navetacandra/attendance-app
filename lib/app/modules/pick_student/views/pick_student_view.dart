@@ -406,7 +406,7 @@ class PickStudentView extends GetView<PickStudentController> {
                 Obx(() => 
                   InkWell(
                     onTap: () => selfC.isLoading.isFalse
-                      ? selfC.submit(context)
+                      ? selfC.submit()
                       : null,
                     child: Container(
                       width: double.infinity,
