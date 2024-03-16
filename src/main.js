@@ -44,8 +44,8 @@ mongo.on("presence-new", (data) => {
     kelas: kelas,
     action: action == 'masuk' ? 'hadir' : action,
     date: dateFormat(new Date()),
-    time: data[action],
-    status: action == 'masuk' ? status : 'pulang'
+    time: data[action] ?? '-',
+    status: action == 'pulang' ? 'pulang' : status
   };
 
   queue.addItem({

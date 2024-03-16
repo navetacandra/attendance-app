@@ -1,6 +1,6 @@
 import { unlinkSync } from "fs";
 import validate from "../validation/validate.js";
-import { attendanceReportValidation, attendanceValidation } from "../validation/attendance.js";
+import { attendanceReportValidation, attendanceValidation, updateAttendanceValidation } from "../validation/attendance.js";
 import { setHeader, writeResponse } from "../utils/sse.js";
 import SuccessResponse from "../responses/success-response.js";
 import ErrorResponse from "../responses/error-response.js";
@@ -44,6 +44,26 @@ export function presenceTagPost(req, res) {
       }
       return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));
     } 
+  }
+}
+
+export function presenceUpdate(req, res) {
+  const { mongo, body } = req;
+  try {
+    const result = validate(updateAttendanceValidation, body);
+    const update = mongo.updatePresence(result);
+    return res.status(200).json(new SuccessResponse(update));
+  } catch(err) {
+    if(err._original) {
+      return res.status(400).json(new ErrorResponse(400, err.details[0].message, 'INVALID_DATA'));
+    } else {
+      const errorDetail = mongo.errorCodes[err];
+      if(!errorDetail) {
+        logger.error(err);
+        return res.status(500).json(new ErrorResponse(500, err.toString(), 'SERVER_ERROR'));
+      }
+      return res.status(errorDetail.code).json(new ErrorResponse(errorDetail.code, errorDetail.message, err));
+    }
   }
 }
 

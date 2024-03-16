@@ -449,6 +449,25 @@ class MongoService extends EventEmitter {
     }
   }
 
+  updatePresence({ studentId, status }) {
+    const presenceDate = this.presenceSchedule.find(schedule => schedule._id == this.attended._id);
+    if(!presenceDate || !presenceDate.isActive) throw 'PRESENCE_INACTIVE';
+    
+    const student = this.students.find(std => std._id == studentId);
+    if(!student) throw 'STUDENT_NOT_REGISTERED';
+
+    const attendedIndex = this.attended.students.findIndex(s => s.studentId == studentId);
+    if(attendedIndex < 0) {
+      this.attended.students.push({studentId: studentId, status});
+    } else {
+      this.attended.students[attendedIndex].status = status;
+    }
+
+    this.emit('presence-update', this.attended.students);
+    this.emit('presence-new', {...student, action: /te[pl]at/.test(status) ? 'hadir' : status});
+    return {id: studentId, status};
+  }
+
   async removeAttended({ id }) {
     for(const schedule of this.presenceSchedule) {
       const attended = await this.db.collection('attended').findOne({ _id: schedule._id });

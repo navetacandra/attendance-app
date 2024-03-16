@@ -8,7 +8,7 @@ import { mongo, whatsapp } from "../application.js";
 import { modeGet, modeUpdate, scheduleDetailGet, scheduleDetailUpdate, scheduleGet, scheduleUpdate } from "../controller/schedule.js";
 import { cardsGet, studentDeleteById, studentGetById, studentPutById, studentsGet, studentsKelasGet, studentsPost } from "../controller/student.js";
 import { onWhatsappGet, whatsappGet, whatsappLogout, whatsappQR } from "../controller/whatsapp.js";
-import { attendedList, attendedReport, presenceTagPost } from "../controller/attendance.js";
+import { attendedList, attendedReport, presenceTagPost, presenceUpdate } from "../controller/attendance.js";
 import { writeResponse } from "../utils/sse.js";
 import { isAdmin, isAuthenticated } from "../middleware/auth.js";
 import { deleteUser, signIn, signOut, signUp, userInfo } from "../controller/authentication.js";
@@ -81,7 +81,8 @@ routerV1.get('/whatsapp/qrcode', isAuthenticated, whatsappQR);
 routerV1.get('/whatsapp/logout', isAuthenticated, whatsappLogout);
 routerV1.get('/on-whatsapp/:number', isAuthenticated, onWhatsappGet);
 routerV1.get('/presence', isAuthenticated, attendedList);
-routerV1.post('/presence',  presenceTagPost);
+routerV1.post('/presence', presenceTagPost);
+routerV1.put('/presence-update', isAuthenticated, presenceUpdate);
 routerV1.get('/presence-report', isAuthenticated, attendedReport);
 
 export { routerV1 as default, sentEvents, streamClients };
