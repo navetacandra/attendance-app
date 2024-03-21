@@ -379,7 +379,8 @@ class MongoService extends EventEmitter {
     if(!availableKelas.includes(kelas)) throw 'KELAS_NOT_FOUND';
     const data = {_id: uuid().replace(/-/g, ''), nama, tel, kelas, createdAt: Date.now(), updatedAt: Date.now(), isNewData: true};
     this.teachers.push(data)
-    this.emit('teachers', quickSort(this.teachers, 0, this.teachers.length - 1, 'nama'));
+    const teachers = this.teachers.filter(teacher => !teacher.removeContent);
+    this.emit('teachers', quickSort(teachers, 0, teachers.length - 1, 'nama'));
     return data;
   }
 
@@ -392,7 +393,8 @@ class MongoService extends EventEmitter {
     this.teachers[chosenTeacher].tel = tel;
     this.teachers[chosenTeacher].kelas = kelas;
     this.teachers[chosenTeacher].updatedAt = Date.now();
-    this.emit('teachers', quickSort(this.teachers, 0, this.teachers.length - 1, 'nama'));
+    const teachers = this.teachers.filter(teacher => !teacher.removeContent);
+    this.emit('teachers', quickSort(teachers, 0, teachers.length - 1, 'nama'));
     return { id, nama, tel, kelas }
   }
 
@@ -401,7 +403,8 @@ class MongoService extends EventEmitter {
     if(chosenTeacher < 0) throw 'TEACHER_NOT_REGISTERED';
     const {_id, nama, tel, kelas} = this.teachers[chosenTeacher];
     this.teachers[chosenTeacher] = {_id, removeContent: true};
-    this.emit('teachers', quickSort(this.teachers, 0, this.teachers.length - 1, 'nama'));
+    const teachers = this.teachers.filter(teacher => !teacher.removeContent);
+    this.emit('teachers', quickSort(teachers, 0, teachers.length - 1, 'nama'));
     return { id: _id, nama, tel, kelas };
   }
 
