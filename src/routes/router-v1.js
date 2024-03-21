@@ -12,6 +12,7 @@ import { attendedList, attendedReport, presenceTagPost, presenceUpdate } from ".
 import { writeResponse } from "../utils/sse.js";
 import { isAdmin, isAuthenticated } from "../middleware/auth.js";
 import { deleteUser, signIn, signOut, signUp, userInfo } from "../controller/authentication.js";
+import { teacherDeleteById, teacherGetById, teacherPutById, teachersGet, teachersPost } from "../controller/teacher.js";
 
 const routerV1 = new Router();
 
@@ -27,6 +28,7 @@ const streamClients = {
   "schedule": [],
   "scheduleDetail": [],
   "students": [],
+  "teachers": [],
   "cards": [],
   "attended": [],
   "whatsapp": []
@@ -45,6 +47,9 @@ function sentEvents() {
   });
   mongo.on("students", students => {
     streamClients.students.forEach(({ client }) => writeResponse(client, students));
+  });
+  mongo.on("teachers", teachers => {
+    streamClients.teachers.forEach(({ client }) => writeResponse(client, teachers));
   });
   mongo.on("cards", cards => {
     streamClients.cards.forEach(({ client }) => writeResponse(client, cards));
@@ -75,6 +80,11 @@ routerV1.get('/students/kelas', isAuthenticated, studentsKelasGet);
 routerV1.get('/student/:studentId', isAuthenticated, studentGetById);
 routerV1.put('/student/:studentId', isAuthenticated, studentPutById);
 routerV1.delete('/student/:studentId', isAuthenticated, studentDeleteById);
+routerV1.get('/teachers', isAuthenticated, teachersGet);
+routerV1.post('/teachers', isAuthenticated, teachersPost);
+routerV1.get('/teacher/:teacherId', isAuthenticated, teacherGetById);
+routerV1.put('/teacher/:teacherId', isAuthenticated, teacherPutById);
+routerV1.delete('/teacher/:teacherId', isAuthenticated, teacherDeleteById);
 routerV1.get('/cards', isAuthenticated, cardsGet);
 routerV1.get('/whatsapp', isAuthenticated, whatsappGet);
 routerV1.get('/whatsapp/qrcode', isAuthenticated, whatsappQR);

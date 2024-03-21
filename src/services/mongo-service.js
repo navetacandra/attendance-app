@@ -105,6 +105,14 @@ class MongoService extends EventEmitter {
       INVALID_DATE: {
         code: 400,
         message: 'Given date invalid or not found'
+      },
+      TEACHER_NOT_REGISTERED: {
+        code: 404,
+        message: 'Teacher not registered'
+      },
+      KELAS_NOT_FOUND: {
+        code: 404,
+        message: 'Kelas not found'
       }
     };
 
@@ -364,6 +372,37 @@ class MongoService extends EventEmitter {
     const students = this.students.filter(student => !student.removeContent);
     this.emit('students', quickSort(students, 0, students.length - 1, 'nis'));
     return { id: _id, nis, nama };
+  }
+
+  createTeacher({ nama, tel, kelas }) {
+    const availableKelas = Array.from(new Set(this.students.map(s => s.kelas)))
+    if(!availableKelas.includes(kelas)) throw 'KELAS_NOT_FOUND';
+    const data = {_id: uuid().replace(/-/g, ''), nama, tel, kelas, createdAt: Date.now(), updatedAt: Date.now(), isNewData: true};
+    this.teachers.push(data)
+    this.emit('teachers', quickSort(this.teachers, 0, this.teachers.length - 1, 'nama'));
+    return data;
+  }
+
+  updateTeacher({ id, nama, tel, kelas }) {
+    const chosenTeacher = this.teachers.findIndex(teacher => teacher._id == id && !teacher.removeContent);
+    if(chosenTeacher < 0) throw 'TEACHER_NOT_REGISTERED';
+    const availableKelas = Array.from(new Set(this.students.map(s => s.kelas)))
+    if(!availableKelas.includes(kelas)) throw 'KELAS_NOT_FOUND';
+    this.teachers[chosenTeacher].nama = nama;
+    this.teachers[chosenTeacher].tel = tel;
+    this.teachers[chosenTeacher].kelas = kelas;
+    this.teachers[chosenTeacher].updatedAt = Date.now();
+    this.emit('teachers', quickSort(this.teachers, 0, this.teachers.length - 1, 'nama'));
+    return { id, nama, tel, kelas }
+  }
+
+  deleteTeacher({ id }) {
+    const chosenTeacher = this.teachers.findIndex(teacher => teacher._id == id && !teacher.removeContent);
+    if(chosenTeacher < 0) throw 'TEACHER_NOT_REGISTERED';
+    const {_id, nama, tel, kelas} = this.teachers[chosenTeacher];
+    this.teachers[chosenTeacher] = {_id, removeContent: true};
+    this.emit('teachers', quickSort(this.teachers, 0, this.teachers.length - 1, 'nama'));
+    return { id: _id, nama, tel, kelas };
   }
 
   addCard({ tag }) {
