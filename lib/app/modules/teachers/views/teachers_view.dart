@@ -2,13 +2,13 @@ import 'package:attendance_app/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import '../controllers/students_controller.dart';
+import '../controllers/teachers_controller.dart';
 
-class StudentsView extends GetView<StudentsController> {
-  StudentsView({super.key});
-  final selfC = Get.find<StudentsController>();
-  final RxBool deleteButtonPressed = false.obs;
-  final RxBool editButtonPressed = false.obs;
+class TeachersView extends GetView<TeachersController> {
+  TeachersView({super.key});
+  final selfC = Get.find<TeachersController>();
+  final editButtonPressed = false.obs;
+  final deleteButtonPressed = false.obs;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class StudentsView extends GetView<StudentsController> {
         minHeight: 0,
         maxHeight: Get.height / 4,
         backdropEnabled: true,
-        onPanelClosed: () => selfC.selectedStudent.value = {},
+        onPanelClosed: () => selfC.selectedTeacher.value = {},
         boxShadow: const <BoxShadow>[
           BoxShadow(
             blurRadius: 8,
@@ -44,7 +44,7 @@ class StudentsView extends GetView<StudentsController> {
         panel: panelWidget(),
         body: Scaffold(
           appBar: AppBar(
-            title: const Text('Students'),
+            title: const Text('Teachers'),
           ),
           body: SingleChildScrollView(
             child: Padding(
@@ -53,23 +53,22 @@ class StudentsView extends GetView<StudentsController> {
                 vertical: 30,
               ),
               child: Obx(() =>
-                selfC.students.isEmpty
+                selfC.teachers.isEmpty
                 ? const Center(
                   child: Text(
-                    "No Students",
+                    "No Teachers",
                     style: TextStyle(fontSize: 25),
                   ),
                 )
                 : Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    for(final student in selfC.students) ...[
-                      studentCard(
-                        id: student["_id"], 
-                        nama: student["nama"], 
-                        kelas: student["kelas"],
-                        nis: student["nis"], 
-                        email: student["email"],
+                    for(final teacher in selfC.teachers) ...[
+                      teacherCard(
+                        id: teacher["_id"], 
+                        nama: teacher["nama"], 
+                        kelas: teacher["kelas"],
+                        tel: teacher["tel"],
                       ),
                     ]
                   ],
@@ -79,9 +78,9 @@ class StudentsView extends GetView<StudentsController> {
             ),
           ),
           floatingActionButton: FloatingActionButton(
-            onPressed: () => Get.toNamed(Routes.ADD_STUDENT),
+            onPressed: () => Get.toNamed(Routes.ADD_TEACHER),
             backgroundColor: Colors.blue.shade400,
-            tooltip: 'Add Student',
+            tooltip: 'Add Teacher',
             child: const Icon(
               Icons.add,
               color: Colors.white,
@@ -93,16 +92,15 @@ class StudentsView extends GetView<StudentsController> {
     );
   }
 
-  InkWell studentCard(
+  InkWell teacherCard(
       {required String id,
       required String nama,
       required String kelas,
-      required String nis,
-      required String email}) {
+      required String tel}) {
     return InkWell(
       onTap: () {
-        selfC.selectedStudent.value =
-            selfC.students.firstWhereOrNull((student) => student['_id'] == id);
+        selfC.selectedTeacher.value =
+            selfC.teachers.firstWhereOrNull((teacher) => teacher['_id'] == id);
         selfC.panelController.open();
       },
       child: Container(
@@ -160,17 +158,7 @@ class StudentsView extends GetView<StudentsController> {
                 SizedBox(
                   width: constraints.maxWidth * .6,
                   child: Text(
-                    "NIS: $nis",
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.start,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-                SizedBox(
-                  width: constraints.maxWidth * .6,
-                  child: Text(
-                    "Email: $email",
+                    "Tel: $tel",
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.start,
@@ -212,7 +200,7 @@ class StudentsView extends GetView<StudentsController> {
                   deleteButtonPressed.value = true;
                   await Future.delayed(const Duration(milliseconds: 225));
                   deleteButtonPressed.value = false;
-                  selfC.deleteStudent();
+                  selfC.deleteTeacher();
                 },
                 child: Obx(
                   () => Container(
@@ -233,7 +221,7 @@ class StudentsView extends GetView<StudentsController> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Delete Student",
+                        "Delete Teacher",
                         style: TextStyle(
                           color: deleteButtonPressed.isTrue
                               ? Colors.white
@@ -258,8 +246,8 @@ class StudentsView extends GetView<StudentsController> {
                   await Future.delayed(const Duration(milliseconds: 225));
                   editButtonPressed.value = false;
                   selfC.panelController.close();
-                  Get.toNamed(Routes.EDIT_STUDENT,
-                      arguments: {"id": selfC.selectedStudent["_id"]});
+                  Get.toNamed(Routes.EDIT_TEACHER,
+                      arguments: {"id": selfC.selectedTeacher["_id"]});
                 },
                 child: Obx(
                   () => Container(
@@ -280,7 +268,7 @@ class StudentsView extends GetView<StudentsController> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Edit Student",
+                        "Edit Teacher",
                         style: TextStyle(
                           color: editButtonPressed.isTrue
                               ? Colors.white

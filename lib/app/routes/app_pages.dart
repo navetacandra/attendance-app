@@ -4,6 +4,8 @@ import '../middelwares/auth_guard.dart';
 import '../middelwares/non_auth_guard.dart';
 import '../modules/add_student/bindings/add_student_binding.dart';
 import '../modules/add_student/views/add_student_view.dart';
+import '../modules/add_teacher/bindings/add_teacher_binding.dart';
+import '../modules/add_teacher/views/add_teacher_view.dart';
 import '../modules/attended_table/bindings/attended_table_binding.dart';
 import '../modules/attended_table/views/attended_table_view.dart';
 import '../modules/auth/bindings/auth_binding.dart';
@@ -12,6 +14,8 @@ import '../modules/cards/bindings/cards_binding.dart';
 import '../modules/cards/views/cards_view.dart';
 import '../modules/edit_student/bindings/edit_student_binding.dart';
 import '../modules/edit_student/views/edit_student_view.dart';
+import '../modules/edit_teacher/bindings/edit_teacher_binding.dart';
+import '../modules/edit_teacher/views/edit_teacher_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/pick_student/bindings/pick_student_binding.dart';
@@ -24,6 +28,8 @@ import '../modules/student_table/bindings/student_table_binding.dart';
 import '../modules/student_table/views/student_table_view.dart';
 import '../modules/students/bindings/students_binding.dart';
 import '../modules/students/views/students_view.dart';
+import '../modules/teachers/bindings/teachers_binding.dart';
+import '../modules/teachers/views/teachers_view.dart';
 import '../modules/whatsapp/bindings/whatsapp_binding.dart';
 import '../modules/whatsapp/views/whatsapp_view.dart';
 
@@ -105,6 +111,24 @@ class AppPages {
       name: _Paths.ATTENDED_TABLE,
       page: () => AttendedTableView(),
       binding: AttendedTableBinding(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage(
+      name: _Paths.ADD_TEACHER,
+      page: () => AddTeacherView(),
+      binding: AddTeacherBinding(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage(
+      name: _Paths.TEACHERS,
+      page: () => TeachersView(),
+      binding: TeachersBinding(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage(
+      name: _Paths.EDIT_TEACHER,
+      page: () => EditTeacherView(),
+      binding: EditTeacherBinding(),
     ),
   ];
 }

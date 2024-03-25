@@ -15,6 +15,9 @@ abstract class Routes {
   static const STUDENT_TABLE = _Paths.STUDENT_TABLE;
   static const AUTH = _Paths.AUTH;
   static const ATTENDED_TABLE = _Paths.ATTENDED_TABLE;
+  static const ADD_TEACHER = _Paths.ADD_TEACHER;
+  static const TEACHERS = _Paths.TEACHERS;
+  static const EDIT_TEACHER = _Paths.EDIT_TEACHER;
 }
 
 abstract class _Paths {
@@ -31,4 +34,7 @@ abstract class _Paths {
   static const STUDENT_TABLE = '/student-table';
   static const AUTH = '/auth';
   static const ATTENDED_TABLE = '/attended-table';
+  static const ADD_TEACHER = '/add-teacher';
+  static const TEACHERS = '/teachers';
+  static const EDIT_TEACHER = '/edit-teacher';
 }

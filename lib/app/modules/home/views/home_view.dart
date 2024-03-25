@@ -224,6 +224,11 @@ class HomeView extends GetView<HomeController> {
                     runSpacing: 20,
                     children: <Widget>[
                       menuItem(
+                        label: "Teachers",
+                        iconPath: "assets/users.png",
+                        navigation: Routes.TEACHERS,
+                      ),
+                      menuItem(
                         label: "Students",
                         iconPath: "assets/users.png",
                         navigation: Routes.STUDENTS,

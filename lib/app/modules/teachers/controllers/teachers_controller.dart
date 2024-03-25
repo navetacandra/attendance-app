@@ -4,23 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class StudentsController extends GetxController {
-  final studentStream = HttpController.streamList("/students");
+class TeachersController extends GetxController {
+  final teacherStream = HttpController.streamList("/teachers");
   final panelController = PanelController();
-  final RxList students = [].obs;
-  final RxMap selectedStudent = {}.obs;
+  final RxList teachers = [].obs;
+  final RxMap selectedTeacher = {}.obs;
 
   @override
   void onInit() {
-    studentStream.stream.listen((studentz) {
-      students.value = studentz;
+    teacherStream.stream.listen((studentz) {
+      teachers.value = studentz;
     });
     super.onInit();
   }
 
   @override
   void onClose() {
-    studentStream.close();
+    teacherStream.close();
     super.onClose();
   }
 
@@ -36,16 +36,16 @@ class StudentsController extends GetxController {
     );
   }
 
-  void deleteStudent() async {
+  void deleteTeacher() async {
     try {
-      final result = await HttpController.delete("/student/${selectedStudent["_id"]}");
+      final result = await HttpController.delete("/teacher/${selectedTeacher["_id"]}");
       if (result["code"] == 200) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          showAlert("Student Deleted", "", ArtSweetAlertType.success, () => panelController.close());
+          showAlert("Teacher Deleted", "", ArtSweetAlertType.success, () => panelController.close());
         });
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          showAlert("Failed Delete Student", result["error"]["message"], ArtSweetAlertType.danger, () {});
+          showAlert("Failed Delete Teacher", result["error"]["message"], ArtSweetAlertType.danger, () {});
         });
       }
     } catch (e) {
